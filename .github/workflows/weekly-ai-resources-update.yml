@@ -21,9 +21,6 @@ jobs:
     steps:
 
       - name: Debug Gist access
-        env:
-          GIST_ID: ${{ secrets.GIST_ID }}
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: |
           echo "GIST_ID: $GIST_ID"
           echo "Checking GET https://api.github.com/gists/$GIST_ID ..."
