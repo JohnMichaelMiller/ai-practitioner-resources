@@ -19,6 +19,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Debug Gist access
+        run: |
+          echo "GIST_ID: $GIST_ID"
+          echo "Checking GET https://api.github.com/gists/$GIST_ID ..."
+          # Save response body and status separately
+          HTTP_CODE=$(curl -s -w "%{http_code}" -o gist_response.json \
+            -H "Authorization: token $GIST_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/gists/$GIST_ID)
+          echo "HTTP status: $HTTP_CODE"
+          echo "--- response body ---"
+          if [ -s gist_response.json ]; then
+            # pretty-print JSON if available
+            if command -v jq >/dev/null 2>&1; then
+              jq . gist_response.json || cat gist_response.json
+            else
+              cat gist_response.json
+            fi
+          else
+            echo "(empty response body)"
+          fi
+
+          # Fail early if the Gist is not accessible
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Error: Failed to access Gist $GIST_ID (HTTP status $HTTP_CODE)."
+            exit 1
+          fi
       - name: Checkout Repository
         uses: actions/checkout@v4
 
