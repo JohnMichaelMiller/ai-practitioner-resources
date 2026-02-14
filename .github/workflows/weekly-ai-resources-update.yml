@@ -43,7 +43,13 @@ jobs:
             fi
           else
             echo "(empty response body)"
-          fi      
+          fi
+
+          # Fail early if the Gist is not accessible
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Error: Failed to access Gist $GIST_ID (HTTP status $HTTP_CODE)."
+            exit 1
+          fi
       - name: Checkout Repository
         uses: actions/checkout@v4
 
