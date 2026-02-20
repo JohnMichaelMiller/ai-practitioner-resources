@@ -127,7 +127,7 @@ async function fetchCurrentResources() {
 
     if (!selectedFile) {
       console.log(
-        "⚠️  No existing resource file found in gist, starting fresh",
+        "⚠️  No existing resources.json found in gist, starting fresh",
       );
       const emptyResources = { resources: [] };
 
