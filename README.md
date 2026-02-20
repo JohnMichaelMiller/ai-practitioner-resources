@@ -105,6 +105,15 @@ npm run run-automation
 
 **Note:** Local execution requires the same environment variables as the GitHub Action.
 
+**🧪 Testing:** Use test commands to safely test changes without affecting production:
+
+```bash
+npm run test:update-gist       # Update test gist only
+npm run test:run-automation    # Full test workflow
+```
+
+See [TEST_QUICK_REFERENCE.md](TEST_QUICK_REFERENCE.md) for details.
+
 ## 🤖 AI Content Generation
 
 This project includes an intelligent prompt system for generating high-quality resource lists.

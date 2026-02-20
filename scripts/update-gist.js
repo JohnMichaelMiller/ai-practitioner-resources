@@ -13,14 +13,29 @@
  *   - GIST_ID: The ID of the target gist
  */
 
+// Load environment variables from .env file
+require("dotenv").config();
+
 const fetch = require("node-fetch");
 const fs = require("fs");
 const path = require("path");
 
-// Configuration
-const GIST_TOKEN = process.env.GIST_TOKEN;
-const GIST_ID = process.env.GIST_ID;
+// Check if running in test mode
+const IS_TEST_MODE = process.env.TEST_MODE === "true";
+
+// Configuration - use test gist if in test mode
+const GIST_TOKEN = IS_TEST_MODE
+  ? process.env.TEST_GIST_TOKEN
+  : process.env.GIST_TOKEN;
+const GIST_ID = IS_TEST_MODE ? process.env.TEST_GIST_ID : process.env.GIST_ID;
 const MERGED_RESOURCES_PATH = path.join("/tmp", "merged-resources.json");
+
+// Log mode
+if (IS_TEST_MODE) {
+  console.log("🧪 Running in TEST mode");
+} else {
+  console.log("🚀 Running in PRODUCTION mode");
+}
 
 // Validate configuration
 if (!GIST_TOKEN) {
@@ -44,7 +59,7 @@ async function updateGist() {
   if (!fs.existsSync(MERGED_RESOURCES_PATH)) {
     console.error(
       "❌ Error: Merged resources file not found at:",
-      MERGED_RESOURCES_PATH
+      MERGED_RESOURCES_PATH,
     );
     process.exit(1);
   }
@@ -83,7 +98,7 @@ async function updateGist() {
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(
-        `Failed to update gist: ${response.status} ${response.statusText}\n${errorText}`
+        `Failed to update gist: ${response.status} ${response.statusText}\n${errorText}`,
       );
     }
 

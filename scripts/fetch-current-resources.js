@@ -10,14 +10,27 @@
  *   - GIST_TOKEN: Personal access token with gist permissions
  *   - GIST_ID: The ID of the target gist
  */
-
+// Load environment variables from .env file
+require("dotenv").config();
 const fetch = require("node-fetch");
 const fs = require("fs");
 const path = require("path");
 
-// Configuration
-const GIST_TOKEN = process.env.GIST_TOKEN;
-const GIST_ID = process.env.GIST_ID;
+// Check if running in test mode
+const IS_TEST_MODE = process.env.TEST_MODE === "true";
+
+// Configuration - use test gist if in test mode
+const GIST_TOKEN = IS_TEST_MODE
+  ? process.env.TEST_GIST_TOKEN
+  : process.env.GIST_TOKEN;
+const GIST_ID = IS_TEST_MODE ? process.env.TEST_GIST_ID : process.env.GIST_ID;
+
+// Log mode
+if (IS_TEST_MODE) {
+  console.log("🧪 Running in TEST mode");
+} else {
+  console.log("🚀 Running in PRODUCTION mode");
+}
 
 // Validate configuration
 if (!GIST_TOKEN) {
@@ -42,7 +55,7 @@ async function verifyGistToken() {
 
   if (!response.ok) {
     throw new Error(
-      `GitHub API error: ${response.status} ${response.statusText}`
+      `GitHub API error: ${response.status} ${response.statusText}`,
     );
   }
 
@@ -70,7 +83,7 @@ async function fetchCurrentResources() {
 
     if (!response.ok) {
       throw new Error(
-        `GitHub API error: ${response.status} ${response.statusText}`
+        `GitHub API error: ${response.status} ${response.statusText}`,
       );
     }
 
@@ -79,7 +92,7 @@ async function fetchCurrentResources() {
     // Look for resources.json in the gist files
     if (!gist.files || !gist.files["resources.json"]) {
       console.log(
-        "⚠️  No existing resources.json found in gist, starting fresh"
+        "⚠️  No existing resources.json found in gist, starting fresh",
       );
       const emptyResources = { resources: [] };
 
@@ -91,7 +104,7 @@ async function fetchCurrentResources() {
 
       fs.writeFileSync(
         path.join(tmpDir, "current-resources.json"),
-        JSON.stringify(emptyResources, null, 2)
+        JSON.stringify(emptyResources, null, 2),
       );
 
       console.log("✅ Created empty resources file");
@@ -110,7 +123,7 @@ async function fetchCurrentResources() {
     // Write to temporary file
     fs.writeFileSync(
       path.join(tmpDir, "current-resources.json"),
-      JSON.stringify(resources, null, 2)
+      JSON.stringify(resources, null, 2),
     );
 
     console.log("✅ Current resources fetched successfully");

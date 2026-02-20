@@ -10,6 +10,9 @@
  *   - ANTHROPIC_API_KEY: API key for Claude access
  */
 
+// Load environment variables from .env file
+require("dotenv").config();
+
 const fs = require("fs");
 const path = require("path");
 
@@ -20,7 +23,7 @@ const PROMPT_PATH = path.join(
   "..",
   ".github",
   "prompts",
-  "ai-practitioner-resources-json.prompt.md"
+  "ai-practitioner-resources-json.prompt.md",
 );
 
 // Validate configuration
@@ -129,7 +132,7 @@ async function generateResources() {
               return match;
             }
             return p1 + '\\"';
-          }
+          },
         );
 
         try {
@@ -137,13 +140,13 @@ async function generateResources() {
           console.log("✅ Fixed JSON parsing succeeded");
         } catch (secondError) {
           console.log(
-            "🔧 Second parse failed, trying manual property fixing..."
+            "🔧 Second parse failed, trying manual property fixing...",
           );
 
           // Last resort: try to fix property names that might be unquoted
           fixedJson = fixedJson.replace(
             /([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g,
-            '$1"$2":'
+            '$1"$2":',
           );
 
           resources = JSON.parse(fixedJson);
@@ -154,7 +157,7 @@ async function generateResources() {
       // Basic validation
       if (!resources.resources || !Array.isArray(resources.resources)) {
         throw new Error(
-          "Generated JSON does not contain a valid resources array"
+          "Generated JSON does not contain a valid resources array",
         );
       }
 
@@ -170,7 +173,7 @@ async function generateResources() {
       // Write to temporary file
       fs.writeFileSync(
         path.join(tmpDir, "new-resources.json"),
-        JSON.stringify(resources, null, 2)
+        JSON.stringify(resources, null, 2),
       );
 
       console.log("✅ New resources saved to /tmp/new-resources.json");
@@ -189,7 +192,7 @@ async function generateResources() {
         }
         fs.writeFileSync(path.join(tmpDir, "raw-response.txt"), jsonResponse);
         console.log(
-          "🔍 Raw response saved to /tmp/raw-response.txt for debugging"
+          "🔍 Raw response saved to /tmp/raw-response.txt for debugging",
         );
       } catch (saveError) {
         console.error("Could not save raw response:", saveError.message);
