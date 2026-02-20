@@ -1,18 +1,12 @@
 {
   "introduction": "A curated collection of the most valuable resources for developers looking to leverage AI for code generation, featuring practical guides on AI-powered coding tools, prompt engineering techniques, and integration strategies for modern software development workflows.",
-  "introduction": "<p>A curated collection of the most valuable resources for developers looking to leverage AI for code generation, featuring practical guides on AI-powered coding tools, prompt engineering techniques, and integration strategies for modern software development workflows.</p>",
   "resources": [
     {
       "type": "Book",
       "title": "AI-Powered Development: Using GitHub Copilot and OpenAI Codex",
       "source": "https://www.oreilly.com/library/view/ai-powered-development/9781098150976/",
       "score": 92,
-      "type": "Book",
-      "title": "AI-Powered Development: Using GitHub Copilot and OpenAI Codex",
-      "source": "https://www.oreilly.com/library/view/ai-powered-development/9781098150976/",
-      "score": 92,
       "weeks_on_list": 1,
-      "blurb": "Comprehensive guide to integrating AI coding assistants into development workflows with practical examples and best practices."
       "blurb": "Comprehensive guide to integrating AI coding assistants into development workflows with practical examples and best practices."
     },
     {
@@ -28,19 +22,7 @@
       "title": "The Art of Prompt Engineering for Code Generation",
       "source": "https://martinfowler.com/articles/2023-chatgpt-xu-hao.html",
       "score": 91,
-      "title": "GitHub Copilot: Getting Started Guide",
-      "source": "https://docs.github.com/en/copilot/getting-started-with-github-copilot",
-      "score": 88,
-      "weeks_on_list": 2,
-      "blurb": "Official documentation providing step-by-step instructions for setting up and using GitHub Copilot effectively."
-    },
-    {
-      "type": "Blog",
-      "title": "The Art of Prompt Engineering for Code Generation",
-      "source": "https://martinfowler.com/articles/2023-chatgpt-xu-hao.html",
-      "score": 91,
       "weeks_on_list": 1,
-      "blurb": "Martin Fowler's insights on leveraging ChatGPT and AI for software development with practical prompt strategies."
       "blurb": "Martin Fowler's insights on leveraging ChatGPT and AI for software development with practical prompt strategies."
     },
     {
@@ -48,11 +30,7 @@
       "title": "OpenAI Codex: Translating Natural Language to Code",
       "source": "https://openai.com/blog/openai-codex",
       "score": 85,
-      "title": "OpenAI Codex: Translating Natural Language to Code",
-      "source": "https://openai.com/blog/openai-codex",
-      "score": 85,
       "weeks_on_list": 1,
-      "blurb": "OpenAI's official introduction to Codex capabilities and applications in automated code generation."
       "blurb": "OpenAI's official introduction to Codex capabilities and applications in automated code generation."
     },
     {
@@ -60,12 +38,7 @@
       "title": "Software Engineering Daily: GitHub Copilot with Mark Riedl",
       "source": "https://softwareengineeringdaily.com/2021/07/20/github-copilot-with-mark-riedl/",
       "score": 82,
-      "type": "Podcast",
-      "title": "Software Engineering Daily: GitHub Copilot with Mark Riedl",
-      "source": "https://softwareengineeringdaily.com/2021/07/20/github-copilot-with-mark-riedl/",
-      "score": 82,
       "weeks_on_list": 1,
-      "blurb": "Deep dive into GitHub Copilot's architecture and implications for software development practices."
       "blurb": "Deep dive into GitHub Copilot's architecture and implications for software development practices."
     },
     {
@@ -73,11 +46,7 @@
       "title": "Generative AI in Software Engineering",
       "source": "https://www.manning.com/books/generative-ai-in-software-engineering",
       "score": 89,
-      "title": "Generative AI in Software Engineering",
-      "source": "https://www.manning.com/books/generative-ai-in-software-engineering",
-      "score": 89,
       "weeks_on_list": 1,
-      "blurb": "Manning's practical approach to implementing generative AI tools throughout the software development lifecycle."
       "blurb": "Manning's practical approach to implementing generative AI tools throughout the software development lifecycle."
     },
     {
@@ -85,11 +54,7 @@
       "title": "Best Practices for AI Code Generation",
       "source": "https://stackoverflow.blog/2023/04/26/comparing-tag-trends-with-our-most-loved-programming-languages/",
       "score": 78,
-      "title": "Best Practices for AI Code Generation",
-      "source": "https://stackoverflow.blog/2023/04/26/comparing-tag-trends-with-our-most-loved-programming-languages/",
-      "score": 78,
       "weeks_on_list": 1,
-      "blurb": "Stack Overflow's analysis of developer trends and practices with AI-assisted coding tools."
       "blurb": "Stack Overflow's analysis of developer trends and practices with AI-assisted coding tools."
     },
     {
@@ -97,21 +62,11 @@
       "title": "AI Pair Programming: Lessons from GitHub Copilot",
       "source": "https://github.blog/2022-09-07-research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/",
       "score": 90,
-      "type": "Blog",
-      "title": "AI Pair Programming: Lessons from GitHub Copilot",
-      "source": "https://github.blog/2022-09-07-research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/",
-      "score": 90,
       "weeks_on_list": 1,
-      "blurb": "Research findings on GitHub Copilot's impact on developer productivity and coding practices."
       "blurb": "Research findings on GitHub Copilot's impact on developer productivity and coding practices."
     },
     {
       "type": "Article",
-      "title": "Amazon CodeWhisperer Developer Guide",
-      "source": "https://docs.aws.amazon.com/codewhisperer/latest/userguide/what-is-cwspr.html",
-      "score": 84,
-      "weeks_on_list": 2,
-      "blurb": "AWS documentation for CodeWhisperer AI coding assistant with integration examples and use cases."
       "title": "Amazon CodeWhisperer Developer Guide",
       "source": "https://docs.aws.amazon.com/codewhisperer/latest/userguide/what-is-cwspr.html",
       "score": 84,
@@ -123,12 +78,7 @@
       "title": "The Changelog: AI-Powered Development Tools",
       "source": "https://changelog.com/podcast/501",
       "score": 81,
-      "type": "Podcast",
-      "title": "The Changelog: AI-Powered Development Tools",
-      "source": "https://changelog.com/podcast/501",
-      "score": 81,
       "weeks_on_list": 1,
-      "blurb": "Discussion of current AI development tools landscape and their impact on programming workflows."
       "blurb": "Discussion of current AI development tools landscape and their impact on programming workflows."
     },
     {
@@ -136,12 +86,7 @@
       "title": "The Pragmatic Programmer's Guide to AI Coding",
       "source": "https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/",
       "score": 87,
-      "type": "Book",
-      "title": "The Pragmatic Programmer's Guide to AI Coding",
-      "source": "https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/",
-      "score": 87,
       "weeks_on_list": 1,
-      "blurb": "Pragmatic approach to integrating AI tools while maintaining code quality and developer craftsmanship."
       "blurb": "Pragmatic approach to integrating AI tools while maintaining code quality and developer craftsmanship."
     },
     {
@@ -149,11 +94,7 @@
       "title": "Microsoft Copilot for Visual Studio",
       "source": "https://visualstudio.microsoft.com/vs/features/intellicode/",
       "score": 83,
-      "title": "Microsoft Copilot for Visual Studio",
-      "source": "https://visualstudio.microsoft.com/vs/features/intellicode/",
-      "score": 83,
       "weeks_on_list": 1,
-      "blurb": "Microsoft's AI-enhanced IntelliCode features for intelligent code completion and suggestions."
       "blurb": "Microsoft's AI-enhanced IntelliCode features for intelligent code completion and suggestions."
     },
     {
@@ -161,12 +102,7 @@
       "title": "Tabnine: AI Code Completion in Practice",
       "source": "https://www.tabnine.com/blog/ai-code-completion-guide/",
       "score": 79,
-      "type": "Blog",
-      "title": "Tabnine: AI Code Completion in Practice",
-      "source": "https://www.tabnine.com/blog/ai-code-completion-guide/",
-      "score": 79,
       "weeks_on_list": 1,
-      "blurb": "Comprehensive guide to AI-powered code completion techniques and implementation strategies."
       "blurb": "Comprehensive guide to AI-powered code completion techniques and implementation strategies."
     },
     {
@@ -174,11 +110,7 @@
       "title": "Google AI Code Generation Research",
       "source": "https://ai.googleblog.com/2022/07/ml-enhanced-code-completion-improves.html",
       "score": 86,
-      "title": "Google AI Code Generation Research",
-      "source": "https://ai.googleblog.com/2022/07/ml-enhanced-code-completion-improves.html",
-      "score": 86,
       "weeks_on_list": 1,
-      "blurb": "Google's research on machine learning enhanced code completion and developer productivity improvements."
       "blurb": "Google's research on machine learning enhanced code completion and developer productivity improvements."
     },
     {
@@ -186,12 +118,7 @@
       "title": "Programming Throwdown: AI in Software Development",
       "source": "https://www.programmingthrowdown.com/",
       "score": 77,
-      "type": "Podcast",
-      "title": "Programming Throwdown: AI in Software Development",
-      "source": "https://www.programmingthrowdown.com/",
-      "score": 77,
       "weeks_on_list": 1,
-      "blurb": "Practical discussion of AI tools integration in real-world software development environments."
       "blurb": "Practical discussion of AI tools integration in real-world software development environments."
     },
     {
@@ -199,12 +126,7 @@
       "title": "Code Complete: AI-Enhanced Edition",
       "source": "https://www.microsoftpressstore.com/store/code-complete-9780735619678",
       "score": 88,
-      "type": "Book",
-      "title": "Code Complete: AI-Enhanced Edition",
-      "source": "https://www.microsoftpressstore.com/store/code-complete-9780735619678",
-      "score": 88,
       "weeks_on_list": 1,
-      "blurb": "Updated classic incorporating AI-assisted development practices with traditional software construction principles."
       "blurb": "Updated classic incorporating AI-assisted development practices with traditional software construction principles."
     },
     {
@@ -212,11 +134,7 @@
       "title": "Hugging Face Code Generation Models",
       "source": "https://huggingface.co/docs/transformers/tasks/code_generation",
       "score": 85,
-      "title": "Hugging Face Code Generation Models",
-      "source": "https://huggingface.co/docs/transformers/tasks/code_generation",
-      "score": 85,
       "weeks_on_list": 1,
-      "blurb": "Technical documentation for implementing and fine-tuning transformer models for code generation tasks."
       "blurb": "Technical documentation for implementing and fine-tuning transformer models for code generation tasks."
     },
     {
@@ -224,12 +142,7 @@
       "title": "JetBrains AI Assistant Integration",
       "source": "https://blog.jetbrains.com/idea/2023/06/ai-assistant-in-jetbrains-ides-all-you-need-to-know/",
       "score": 82,
-      "type": "Blog",
-      "title": "JetBrains AI Assistant Integration",
-      "source": "https://blog.jetbrains.com/idea/2023/06/ai-assistant-in-jetbrains-ides-all-you-need-to-know/",
-      "score": 82,
       "weeks_on_list": 1,
-      "blurb": "JetBrains' approach to integrating AI assistance across their IDE ecosystem with practical examples."
       "blurb": "JetBrains' approach to integrating AI assistance across their IDE ecosystem with practical examples."
     },
     {
@@ -237,11 +150,7 @@
       "title": "Ethics and Best Practices in AI-Generated Code",
       "source": "https://ethicalml.ai/2023/02/ai-code-generation-ethics/",
       "score": 80,
-      "title": "Ethics and Best Practices in AI-Generated Code",
-      "source": "https://ethicalml.ai/2023/02/ai-code-generation-ethics/",
-      "score": 80,
       "weeks_on_list": 1,
-      "blurb": "Important considerations for responsible use of AI in code generation including security and licensing issues."
       "blurb": "Important considerations for responsible use of AI in code generation including security and licensing issues."
     },
     {
@@ -249,17 +158,10 @@
       "title": "Developer Tea: AI Coding Tools Discussion",
       "source": "https://developertea.com/episodes/ai-assisted-development-with-github-copilot",
       "score": 76,
-      "type": "Podcast",
-      "title": "Developer Tea: AI Coding Tools Discussion",
-      "source": "https://developertea.com/episodes/ai-assisted-development-with-github-copilot",
-      "score": 76,
       "weeks_on_list": 1,
-      "blurb": "Focused discussion on practical AI coding tool adoption and developer workflow integration strategies."
       "blurb": "Focused discussion on practical AI coding tool adoption and developer workflow integration strategies."
     }
   ],
-  "legend": "<h4>📊 Resource Scoring System</h4><ul><li><strong>🟢 90-100:</strong> Excellent - Top-tier resources with exceptional practical value</li><li><strong>🟡 75-89:</strong> Good - Solid, useful resources with strong practical application</li><li><strong>🔴 0-74:</strong> Fair - Less practical or more theoretical resources</li></ul><h5>Scoring Criteria:</h5><ul><li><strong>Practical Value (40%):</strong> Hands-on coding techniques and real-world application</li><li><strong>Clarity (25%):</strong> Accessibility and ease of understanding</li><li><strong>Depth (20%):</strong> Comprehensive coverage of topics</li><li><strong>Relevance (15%):</strong> Currency and applicability to modern development</li></ul>",
-  "analysis": "<p>This week's selection showcases the <strong>rapid maturation</strong> of AI-powered development tools, with GitHub Copilot and similar assistants becoming mainstream development resources. The list demonstrates a <strong>balanced approach</strong> between practical implementation guides and foundational understanding.</p><p><strong>Key trends observed:</strong> Official documentation from major tech companies (GitHub, AWS, Microsoft) dominates the high-scoring resources, indicating the enterprise adoption of AI coding tools. The inclusion of ethics-focused content reflects growing awareness of responsible AI use in development.</p><p>The resource distribution shows <strong>60% articles and blogs</strong>, emphasizing the fast-moving nature of this field where written guides provide the most current information. <strong>Average score: 84.2</strong>, indicating generally high-quality, practical resources that developers can immediately apply to their workflows.</p>"
   "legend": "<h4>📊 Resource Scoring System</h4><ul><li><strong>🟢 90-100:</strong> Excellent - Top-tier resources with exceptional practical value</li><li><strong>🟡 75-89:</strong> Good - Solid, useful resources with strong practical application</li><li><strong>🔴 0-74:</strong> Fair - Less practical or more theoretical resources</li></ul><h5>Scoring Criteria:</h5><ul><li><strong>Practical Value (40%):</strong> Hands-on coding techniques and real-world application</li><li><strong>Clarity (25%):</strong> Accessibility and ease of understanding</li><li><strong>Depth (20%):</strong> Comprehensive coverage of topics</li><li><strong>Relevance (15%):</strong> Currency and applicability to modern development</li></ul>",
   "analysis": "<p>This week's selection showcases the <strong>rapid maturation</strong> of AI-powered development tools, with GitHub Copilot and similar assistants becoming mainstream development resources. The list demonstrates a <strong>balanced approach</strong> between practical implementation guides and foundational understanding.</p><p><strong>Key trends observed:</strong> Official documentation from major tech companies (GitHub, AWS, Microsoft) dominates the high-scoring resources, indicating the enterprise adoption of AI coding tools. The inclusion of ethics-focused content reflects growing awareness of responsible AI use in development.</p><p>The resource distribution shows <strong>60% articles and blogs</strong>, emphasizing the fast-moving nature of this field where written guides provide the most current information. <strong>Average score: 84.2</strong>, indicating generally high-quality, practical resources that developers can immediately apply to their workflows.</p>"
 }
