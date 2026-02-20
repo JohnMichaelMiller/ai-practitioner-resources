@@ -64,20 +64,40 @@ async function updateGist() {
     process.exit(1);
   }
 
-  const mergedResources = fs.readFileSync(MERGED_RESOURCES_PATH, "utf8");
+  const mergedResourcesText = fs.readFileSync(MERGED_RESOURCES_PATH, "utf8");
+  const mergedResourcesData = JSON.parse(mergedResourcesText);
   const timestamp = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
+  const fullTimestamp = new Date().toISOString();
+  const environment = IS_TEST_MODE ? "test" : "production";
+
+  // Add metadata to the resources
+  mergedResourcesData.metadata = {
+    last_updated: fullTimestamp,
+    environment: environment,
+  };
+
+  const mergedResources = JSON.stringify(mergedResourcesData, null, 2);
 
   console.log(`   Timestamp: ${timestamp}`);
+  console.log(`   Environment: ${environment}`);
 
   const gistUrl = `https://api.github.com/gists/${GIST_ID}`;
+
+  // Use environment-specific filename
+  const currentFilename = IS_TEST_MODE
+    ? "resources.test.json"
+    : "resources.prod.json";
+  const archiveFilename = IS_TEST_MODE
+    ? `resources.test.${timestamp}.json`
+    : `resources.prod.${timestamp}.json`;
 
   // Prepare update data with both current and archived versions
   const updateData = {
     files: {
-      "resources.json": {
+      [currentFilename]: {
         content: mergedResources,
       },
-      [`resources.${timestamp}.json`]: {
+      [archiveFilename]: {
         content: mergedResources,
       },
     },
@@ -105,8 +125,8 @@ async function updateGist() {
     const result = await response.json();
 
     console.log("✅ Gist updated successfully");
-    console.log(`   Current version: resources.json`);
-    console.log(`   Archived version: resources.${timestamp}.json`);
+    console.log(`   Current version: ${currentFilename}`);
+    console.log(`   Archived version: ${archiveFilename}`);
     console.log(`   Gist URL: ${result.html_url}`);
 
     return result;

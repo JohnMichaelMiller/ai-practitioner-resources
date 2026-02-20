@@ -5,7 +5,10 @@
 // Default Gist configuration
 export const GIST_CONFIG = {
   // Production gist URL
-  url: "https://gist.githubusercontent.com/j0hnnymiller/1a9d84d165a170d6f62cc052db97b8bb/raw/resources.json",
+  // url: "https://gist.githubusercontent.com/JohnMichaelMiller/87014ff112bc5e218bcd52df21b860f8/raw/e46156400c9f84e894140a1ae27552460feb4705/resources.prod.json",
+
+  // Test gist URL (currently deployed)
+  url: "https://gist.githubusercontent.com/JohnMichaelMiller/a143ad703b899d9829f00e5c05a0ad82/raw/bfbb12bf8be3c0b69a653942e7f98b026c6e58fb/resources.test.json",
 
   // Alternative: Local test data (for development)
   // url: "./test-local.json",
