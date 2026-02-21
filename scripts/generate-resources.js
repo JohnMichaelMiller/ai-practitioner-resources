@@ -18,6 +18,7 @@ const path = require("path");
 
 // Configuration
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const TEMPERATURE = parseFloat(process.env.AI_TEMPERATURE || "0.3");
 const PROMPT_PATH = path.join(
   __dirname,
   "..",
@@ -50,6 +51,7 @@ async function generateResources() {
 
   try {
     console.log("⏳ Calling Anthropic Claude API (this may take a minute)...");
+    console.log(`   Temperature: ${TEMPERATURE} (${TEMPERATURE < 0.5 ? 'high determinism' : 'balanced'})`);
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -61,10 +63,21 @@ async function generateResources() {
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 10000,
+        temperature: TEMPERATURE,
         messages: [
           {
             role: "user",
-            content: `You are an expert AI researcher who curates high-quality resources for developers. Generate ONLY valid JSON with no additional text. Requirements: 1) Use REAL, ACTUAL resources with genuine URLs (never use example.com or placeholder links), 2) Include 15-25 diverse resources from reputable sources like official documentation, established publishers (O'Reilly, Manning, Pragmatic Programmers), respected blogs (Martin Fowler, Stack Overflow), and popular podcasts, 3) Ensure all property names and string values are properly quoted with double quotes.\n\n${promptContent}`,
+            content: `You are an expert AI researcher who curates high-quality resources for developers. Generate ONLY valid JSON with no additional text.
+
+IMPORTANT CONSISTENCY REQUIREMENTS:
+1) Prefer STABLE, WELL-KNOWN resources from authoritative sources (OWASP, NIST, Microsoft, AWS, Google, O'Reilly, Manning, Pragmatic Programmers)
+2) Use REAL, ACTUAL resources with genuine, canonical URLs (never use example.com or placeholder links)
+3) Favor resources that are likely to persist across multiple runs (official documentation, established books, major security frameworks)
+4) Include 15-25 diverse resources, prioritizing foundational/evergreen content over trendy ephemeral articles
+5) Ensure all property names and string values are properly quoted with double quotes
+6) Use consistent URL formats (prefer official domains and stable permalinks)
+
+${promptContent}`,
           },
         ],
       }),
