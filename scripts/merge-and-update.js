@@ -102,6 +102,88 @@ function urlSimilarity(url1, url2) {
 }
 
 /**
+ * Normalize URL for matching (remove trailing slashes, protocol variations, www prefix)
+ */
+function normalizeUrl(url) {
+  if (!url) return '';
+  return url
+    .toLowerCase()
+    .replace(/^https?:\/\//, '') // Remove protocol
+    .replace(/^www\./, '')        // Remove www
+    .replace(/\/+$/, '')           // Remove trailing slashes
+    .replace(/\/$/, '');           // Remove final slash
+}
+
+/**
+ * Normalize title for matching (trim, lowercase, remove special chars)
+ */
+function normalizeTitle(title) {
+  if (!title) return '';
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[:\-—–]/g, ' ')     // Replace separators with spaces
+    .replace(/\s+/g, ' ')          // Normalize whitespace
+    .trim();
+}
+
+/**
+ * Calculate similarity between two titles (0-1, higher is more similar)
+ * Uses multiple strategies:
+ * 1. Exact normalized match = 1.0
+ * 2. One contains the other = 0.9
+ * 3. Word overlap > 70% = 0.8
+ * 4. Significant word overlap > 50% = 0.7
+ */
+function titleSimilarity(title1, title2) {
+  if (!title1 || !title2) return 0;
+  
+  const norm1 = normalizeTitle(title1);
+  const norm2 = normalizeTitle(title2);
+  
+  // Exact match
+  if (norm1 === norm2) return 1.0;
+  
+  // One contains the other (handles subtitle differences)
+  if (norm1.includes(norm2) || norm2.includes(norm1)) return 0.9;
+  
+  // Word overlap calculation
+  const words1 = new Set(norm1.split(' ').filter(w => w.length > 2)); // Ignore short words
+  const words2 = new Set(norm2.split(' ').filter(w => w.length > 2));
+  
+  if (words1.size === 0 || words2.size === 0) return 0;
+  
+  const intersection = new Set([...words1].filter(w => words2.has(w)));
+  const union = new Set([...words1, ...words2]);
+  const overlap = intersection.size / union.size;
+  
+  if (overlap > 0.7) return 0.8;
+  if (overlap > 0.5) return 0.7;
+  
+  return 0;
+}
+
+/**
+ * Calculate similarity between two URLs (0-1, higher is more similar)
+ */
+function urlSimilarity(url1, url2) {
+  if (!url1 || !url2) return 0;
+  
+  const norm1 = normalizeUrl(url1);
+  const norm2 = normalizeUrl(url2);
+  
+  // Exact match
+  if (norm1 === norm2) return 1.0;
+  
+  // Same domain
+  const domain1 = norm1.split('/')[0];
+  const domain2 = norm2.split('/')[0];
+  if (domain1 === domain2) return 0.7;
+  
+  return 0;
+}
+
+/**
  * Merge and update resources
  */
 function mergeAndUpdateResources() {
