@@ -22,6 +22,9 @@ const TEMPERATURE = parseFloat(process.env.AI_TEMPERATURE || "0.3");
 const TARGET_RESOURCE_COUNT = parseInt(
   process.env.TARGET_RESOURCE_COUNT || "20",
 );
+const PRIMARY_MODEL =
+  process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5-20250929";
+const FALLBACK_MODELS = ["claude-3-5-sonnet-latest"];
 const PROMPT_PATH = path.join(
   __dirname,
   "..",
@@ -141,32 +144,65 @@ IMPORTANT REQUIREMENTS:
 ${promptContent}`;
     }
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 25000,
-        temperature: TEMPERATURE,
-        messages: [
-          {
-            role: "user",
-            content: instruction,
-          },
-        ],
-      }),
-    });
+    const modelCandidates = [
+      PRIMARY_MODEL,
+      ...FALLBACK_MODELS.filter((model) => model !== PRIMARY_MODEL),
+    ];
+    let result;
+    let lastError = null;
 
-    if (!response.ok) {
+    for (const model of modelCandidates) {
+      console.log(`   Trying model: ${model}`);
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 25000,
+          temperature: TEMPERATURE,
+          messages: [
+            {
+              role: "user",
+              content: instruction,
+            },
+          ],
+        }),
+      });
+
+      if (response.ok) {
+        result = await response.json();
+        console.log(`✅ Model accepted: ${model}`);
+        break;
+      }
+
       const errorText = await response.text();
-      throw new Error(`Claude API error: ${response.status} ${errorText}`);
+      lastError = new Error(
+        `Claude API error for model ${model}: ${response.status} ${errorText}`,
+      );
+
+      // Retry with fallback model on 404 (model not found).
+      if (response.status === 404) {
+        console.log(
+          `⚠️  Model not found (404): ${model}. Trying next fallback model...`,
+        );
+        continue;
+      }
+
+      throw lastError;
     }
 
-    const result = await response.json();
+    if (!result) {
+      throw (
+        lastError ||
+        new Error("Claude API error: no model produced a successful response")
+      );
+    }
+
     const jsonResponse = result.content[0].text;
     console.log("✅ Received response from Claude");
     console.log(`   Response length: ${jsonResponse.length} characters`);

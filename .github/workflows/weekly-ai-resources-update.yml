@@ -4,7 +4,8 @@ on:
   schedule:
     # Run weekly on Mondays at 1:00 AM GMT
     - cron: "0 1 * * 1"
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch:
+    # Allow manual triggering
 
 env:
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -21,6 +22,47 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Preflight Validate Secrets and Gist Access
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            echo "❌ Missing required secret: ANTHROPIC_API_KEY"
+            exit 1
+          fi
+
+          if [ -z "${GIST_TOKEN:-}" ]; then
+            echo "❌ Missing required secret: GIST_TOKEN or GITHUB_GIST_TOKEN"
+            exit 1
+          fi
+
+          if [ -z "${GIST_ID:-}" ]; then
+            echo "❌ Missing required secret: GIST_ID"
+            exit 1
+          fi
+
+          if [[ "${GIST_ID}" =~ ^(ghp_|github_pat_) ]]; then
+            echo "❌ GIST_ID appears to be a GitHub token. Set GIST_ID to the gist ID (or gist URL), not your PAT."
+            exit 1
+          fi
+
+          echo "🔎 Checking Gist API access..."
+          STATUS=$(curl -sS -o /tmp/gist-preflight-response.json -w "%{http_code}" \
+            -H "Authorization: token ${GIST_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/gists/${GIST_ID}")
+
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Failed to access Gist ${GIST_ID} (HTTP status ${STATUS})."
+            echo "Possible fixes: rotate token, ensure token has gist scope, and verify GIST_ID is correct."
+            echo "--- response body ---"
+            cat /tmp/gist-preflight-response.json
+            exit 1
+          fi
+
+          echo "✅ Preflight passed: secrets are present and Gist is reachable."
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

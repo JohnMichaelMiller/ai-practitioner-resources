@@ -23,11 +23,28 @@ const path = require("path");
 // Check if running in test mode
 const IS_TEST_MODE = process.env.TEST_MODE === "true";
 
+function extractGistId(value) {
+  if (!value) return "";
+  const trimmed = value.trim();
+
+  // Support raw gist IDs directly.
+  if (/^[a-f0-9]{32}$/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  // Support gist URLs by extracting the trailing id segment.
+  const match = trimmed.match(/\/([a-f0-9]{32})(?:\/|$)/i);
+  return match ? match[1] : trimmed;
+}
+
 // Configuration - use test gist if in test mode
 const GIST_TOKEN = IS_TEST_MODE
-  ? process.env.TEST_GIST_TOKEN
-  : process.env.GIST_TOKEN;
-const GIST_ID = IS_TEST_MODE ? process.env.TEST_GIST_ID : process.env.GIST_ID;
+  ? process.env.TEST_GIST_TOKEN || process.env.TEST_GITHUB_GIST_TOKEN
+  : process.env.GIST_TOKEN || process.env.GITHUB_GIST_TOKEN;
+const RAW_GIST_ID = IS_TEST_MODE
+  ? process.env.TEST_GIST_ID
+  : process.env.GIST_ID;
+const GIST_ID = extractGistId(RAW_GIST_ID);
 const MERGED_RESOURCES_PATH = path.join("/tmp", "merged-resources.json");
 
 // Log mode
@@ -45,6 +62,13 @@ if (!GIST_TOKEN) {
 
 if (!GIST_ID) {
   console.error("❌ Error: GIST_ID environment variable is required");
+  process.exit(1);
+}
+
+if (/^(ghp_|github_pat_)/.test(GIST_ID)) {
+  console.error(
+    "❌ Error: GIST_ID appears to be a GitHub token. Set GIST_ID to the 32-character gist ID (or gist URL), not your PAT.",
+  );
   process.exit(1);
 }
 
@@ -117,6 +141,11 @@ async function updateGist() {
 
     if (!response.ok) {
       const errorText = await response.text();
+      if (response.status === 404) {
+        throw new Error(
+          `Failed to update gist: 404 Not Found. Check GIST_ID (${GIST_ID}) and ensure GIST_TOKEN has access to that gist.\n${errorText}`,
+        );
+      }
       throw new Error(
         `Failed to update gist: ${response.status} ${response.statusText}\n${errorText}`,
       );
