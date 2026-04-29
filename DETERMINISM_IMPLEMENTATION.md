@@ -182,7 +182,7 @@ npm run test:merge | grep -E "(Matched|Fuzzy|New resources)"
 
 - [DETERMINISM_GUIDE.md](DETERMINISM_GUIDE.md) - Complete tuning guide
 - [scripts/README.md](scripts/README.md) - Automation overview
-- [.github/prompts/](. github/prompts/) - Prompt templates
+- [.github/prompts/](.github/prompts/) - Prompt templates
 
 ## Success Criteria
 
