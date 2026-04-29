@@ -60,7 +60,7 @@ This project features **fully automated weekly resource generation** using GitHu
 
 1. **Every Monday at 9 AM UTC**, the automation workflow runs automatically
 2. **Fetches current resources** from your GitHub Gist
-3. **Generates new resources** using OpenAI GPT-4 and the project prompt
+3. **Generates new resources** using Anthropic Claude and the project prompt
 4. **Intelligently merges** new and existing resources, tracking weeks_on_list
 5. **Validates** the generated JSON against the schema
 6. **Updates the gist** with both current and timestamped archive versions
@@ -70,8 +70,8 @@ This project features **fully automated weekly resource generation** using GitHu
 
 To enable automation, configure these secrets in your repository:
 
-- `OPENAI_API_KEY` - Your OpenAI API key for GPT-4 access
-- `GITHUB_GIST_TOKEN` - Personal access token with **gist** scope (read and write permissions for gists)
+- `ANTHROPIC_API_KEY` - Your Anthropic API key for Claude access
+- `GIST_TOKEN` - Personal access token with **gist** scope (read and write permissions for gists)
 - `GIST_ID` - The ID of your target GitHub Gist
 
 📖 **Detailed Setup Guide:** See [docs/AUTOMATION_SETUP.md](docs/AUTOMATION_SETUP.md) for step-by-step instructions.
@@ -105,13 +105,22 @@ npm run run-automation
 
 **Note:** Local execution requires the same environment variables as the GitHub Action.
 
+**🧪 Testing:** Use test commands to safely test changes without affecting production:
+
+```bash
+npm run test:update-gist       # Update test gist only
+npm run test:run-automation    # Full test workflow
+```
+
+See [TEST_QUICK_REFERENCE.md](TEST_QUICK_REFERENCE.md) for details.
+
 ## 🤖 AI Content Generation
 
 This project includes an intelligent prompt system for generating high-quality resource lists.
 
 ### Automated Generation (Recommended)
 
-The **Weekly AI Resources Update** workflow automatically generates new resources every Monday using OpenAI GPT-4. No manual intervention required!
+The **Weekly AI Resources Update** workflow automatically generates new resources every Monday using Anthropic Claude. No manual intervention required!
 
 ### Manual Generation
 

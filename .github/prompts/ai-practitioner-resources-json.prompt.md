@@ -1,6 +1,11 @@
 Generate a comprehensive list of resources that help developers safely integrate AI coding assistants while mitigating principal risks. Output the results as a JSON object that conforms to the AI Practitioner Resources schema.
 
-**IMPORTANT: Use only REAL, EXISTING resources with genuine URLs. Never use placeholder domains like example.com or fictional resources.**
+**CRITICAL CONSISTENCY REQUIREMENTS:**
+- **Prioritize STABLE, AUTHORITATIVE resources** that are likely to persist across multiple generation runs
+- **Prefer foundational sources**: Official security frameworks (OWASP, NIST), major cloud providers (AWS, Azure, Google), established publishers (O'Reilly, Manning), respected industry blogs (Martin Fowler, ThoughtWorks)
+- **Use canonical URLs**: Official documentation sites, publisher websites, stable permalink formats
+- **Favor evergreen content** over time-sensitive news articles or blog posts
+- Use only REAL, EXISTING resources with genuine URLs. Never use placeholder domains like example.com or fictional resources
 
 ## Risk-Based Content Focus
 

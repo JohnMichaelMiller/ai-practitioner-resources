@@ -4,8 +4,11 @@
 
 // Default Gist configuration
 export const GIST_CONFIG = {
-  // Production gist URL
-  url: "https://gist.githubusercontent.com/j0hnnymiller/1a9d84d165a170d6f62cc052db97b8bb/raw/resources.json",
+  // Production gist URL (revision-free so it always fetches the latest content)
+  url: "https://gist.githubusercontent.com/JohnMichaelMiller/87014ff112bc5e218bcd52df21b860f8/raw/resources.prod.json",
+
+  // Alternative: Test gist URL (for development/testing only)
+  // url: "https://gist.githubusercontent.com/JohnMichaelMiller/a143ad703b899d9829f00e5c05a0ad82/raw/resources.test.json",
 
   // Alternative: Local test data (for development)
   // url: "./test-local.json",

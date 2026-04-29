@@ -10,14 +10,44 @@
  *   - GIST_TOKEN: Personal access token with gist permissions
  *   - GIST_ID: The ID of the target gist
  */
-
+// Load environment variables from .env file
+require("dotenv").config();
 const fetch = require("node-fetch");
 const fs = require("fs");
 const path = require("path");
 
-// Configuration
-const GIST_TOKEN = process.env.GIST_TOKEN;
-const GIST_ID = process.env.GIST_ID;
+// Check if running in test mode
+const IS_TEST_MODE = process.env.TEST_MODE === "true";
+
+function extractGistId(value) {
+  if (!value) return "";
+  const trimmed = value.trim();
+
+  // Support raw gist IDs directly.
+  if (/^[a-f0-9]{32}$/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  // Support gist URLs by extracting the trailing id segment.
+  const match = trimmed.match(/\/([a-f0-9]{32})(?:\/|$)/i);
+  return match ? match[1] : trimmed;
+}
+
+// Configuration - use test gist if in test mode
+const GIST_TOKEN = IS_TEST_MODE
+  ? process.env.TEST_GIST_TOKEN || process.env.TEST_GITHUB_GIST_TOKEN
+  : process.env.GIST_TOKEN || process.env.GITHUB_GIST_TOKEN;
+const RAW_GIST_ID = IS_TEST_MODE
+  ? process.env.TEST_GIST_ID
+  : process.env.GIST_ID;
+const GIST_ID = extractGistId(RAW_GIST_ID);
+
+// Log mode
+if (IS_TEST_MODE) {
+  console.log("🧪 Running in TEST mode");
+} else {
+  console.log("🚀 Running in PRODUCTION mode");
+}
 
 // Validate configuration
 if (!GIST_TOKEN) {
@@ -27,6 +57,13 @@ if (!GIST_TOKEN) {
 
 if (!GIST_ID) {
   console.error("❌ Error: GIST_ID environment variable is required");
+  process.exit(1);
+}
+
+if (/^(ghp_|github_pat_)/.test(GIST_ID)) {
+  console.error(
+    "❌ Error: GIST_ID appears to be a GitHub token. Set GIST_ID to the 32-character gist ID (or gist URL), not your PAT.",
+  );
   process.exit(1);
 }
 
@@ -42,7 +79,7 @@ async function verifyGistToken() {
 
   if (!response.ok) {
     throw new Error(
-      `GitHub API error: ${response.status} ${response.statusText}`
+      `GitHub API error: ${response.status} ${response.statusText}`,
     );
   }
 
@@ -69,17 +106,28 @@ async function fetchCurrentResources() {
     });
 
     if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(
+          `GitHub Gist not found (404). Check GIST_ID (${GIST_ID}) and ensure GIST_TOKEN can access this gist.`,
+        );
+      }
       throw new Error(
-        `GitHub API error: ${response.status} ${response.statusText}`
+        `GitHub API error: ${response.status} ${response.statusText}`,
       );
     }
 
     const gist = await response.json();
 
-    // Look for resources.json in the gist files
-    if (!gist.files || !gist.files["resources.json"]) {
+    const candidateFiles = IS_TEST_MODE
+      ? ["resources.test.json", "resources.json", "resources.prod.json"]
+      : ["resources.prod.json", "resources.json", "resources.test.json"];
+    const selectedFile = candidateFiles.find(
+      (fileName) => gist.files && gist.files[fileName],
+    );
+
+    if (!selectedFile) {
       console.log(
-        "⚠️  No existing resources.json found in gist, starting fresh"
+        "⚠️  No existing resource file found in gist, starting fresh",
       );
       const emptyResources = { resources: [] };
 
@@ -91,14 +139,15 @@ async function fetchCurrentResources() {
 
       fs.writeFileSync(
         path.join(tmpDir, "current-resources.json"),
-        JSON.stringify(emptyResources, null, 2)
+        JSON.stringify(emptyResources, null, 2),
       );
 
       console.log("✅ Created empty resources file");
       return emptyResources;
     }
 
-    const resourcesContent = gist.files["resources.json"].content;
+    console.log(`   Source file: ${selectedFile}`);
+    const resourcesContent = gist.files[selectedFile].content;
     const resources = JSON.parse(resourcesContent);
 
     // Create /tmp directory if it doesn't exist
@@ -110,7 +159,7 @@ async function fetchCurrentResources() {
     // Write to temporary file
     fs.writeFileSync(
       path.join(tmpDir, "current-resources.json"),
-      JSON.stringify(resources, null, 2)
+      JSON.stringify(resources, null, 2),
     );
 
     console.log("✅ Current resources fetched successfully");

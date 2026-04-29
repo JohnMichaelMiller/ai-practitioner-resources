@@ -197,6 +197,24 @@
     "analysis": {
       "type": "string",
       "description": "HTML-formatted analysis of risk coverage patterns, resource selection methodology, and trends in AI coding risk mitigation"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Metadata about when and how the resource list was generated",
+      "properties": {
+        "last_updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the resource list was last updated"
+        },
+        "environment": {
+          "type": "string",
+          "enum": ["production", "test"],
+          "description": "Environment where the resource list was generated (production or test)"
+        }
+      },
+      "required": ["last_updated", "environment"],
+      "additionalProperties": false
     }
   },
   "required": ["introduction", "resources", "legend", "analysis"],

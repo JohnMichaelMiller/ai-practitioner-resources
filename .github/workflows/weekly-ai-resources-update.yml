@@ -4,7 +4,8 @@ on:
   schedule:
     # Run weekly on Mondays at 1:00 AM GMT
     - cron: "0 1 * * 1"
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch:
+    # Allow manual triggering
 
 env:
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -20,36 +21,43 @@ jobs:
 
     steps:
 
-      - name: Debug Gist access
-        run: |
-          echo "GIST_ID: $GIST_ID"
-          echo "Checking GET https://api.github.com/gists/$GIST_ID ..."
-          # Save response body and status separately
-          HTTP_CODE=$(curl -s -w "%{http_code}" -o gist_response.json \
-            -H "Authorization: token $GIST_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/gists/$GIST_ID)
-          echo "HTTP status: $HTTP_CODE"
-          echo "--- response body ---"
-          if [ -s gist_response.json ]; then
-            # pretty-print JSON if available
-            if command -v jq >/dev/null 2>&1; then
-              jq . gist_response.json || cat gist_response.json
-            else
-              cat gist_response.json
-            fi
-          else
-            echo "(empty response body)"
-          fi
-
-          # Fail early if the Gist is not accessible
-          if [ "$HTTP_CODE" -ne 200 ]; then
-            echo "Error: Failed to access Gist $GIST_ID (HTTP status $HTTP_CODE)."
-            exit 1
-          fi
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Preflight Validate Secrets and Gist Access
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            echo "❌ Missing required secret: ANTHROPIC_API_KEY"
+            exit 1
+          fi
+
+          if [ -z "${GIST_TOKEN:-}" ]; then
+            echo "❌ Missing required secret: GIST_TOKEN or GITHUB_GIST_TOKEN"
+            exit 1
+          fi
+
+          if [ -z "${GIST_ID:-}" ]; then
+            echo "❌ Missing required secret: GIST_ID"
+            exit 1
+          fi
+
+          if [[ "${GIST_ID}" =~ ^(ghp_|github_pat_) ]]; then
+            echo "❌ GIST_ID appears to be a GitHub token. Set GIST_ID to the gist ID (or gist URL), not your PAT."
+            exit 1
+          fi
+
+          if [[ "${GIST_ID}" =~ ^https?://gist\.github\.com/ ]]; then
+            if [[ ! "${GIST_ID}" =~ ([0-9a-fA-F]{32})/?$ ]]; then
+              echo "❌ GIST_ID was provided as a URL, but no valid 32-character gist ID could be extracted."
+              echo "Set GIST_ID to a raw gist ID or a valid gist URL."
+              exit 1
+            fi
+          fi
+
+          echo "✅ Preflight passed: required secrets are present and GIST_ID format is valid."
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
