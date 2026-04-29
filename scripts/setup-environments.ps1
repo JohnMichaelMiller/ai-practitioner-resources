@@ -29,12 +29,13 @@ function ConvertFrom-SecureStringToPlainText {
 
 # Environment variables required by the automation scripts
 $envVarDefinitions = @(
-    @{ Name = "OPENAI_API_KEY";    Sensitive = $true;  Description = "OpenAI API key for AI generation" }
-    @{ Name = "GITHUB_GIST_TOKEN"; Sensitive = $true;  Description = "GitHub personal access token with gist scope" }
+    @{ Name = "ANTHROPIC_API_KEY"; Sensitive = $true;  Description = "Anthropic API key for Claude AI generation (required)" }
+    @{ Name = "GIST_TOKEN";        Sensitive = $true;  Description = "GitHub personal access token with gist scope (primary, required)" }
+    @{ Name = "GITHUB_GIST_TOKEN"; Sensitive = $true;  Description = "GitHub personal access token with gist scope (fallback, for compatibility)" }
     @{ Name = "GIST_ID";           Sensitive = $false; Description = "Production GitHub Gist ID" }
     @{ Name = "TEST_GIST_ID";      Sensitive = $false; Description = "Test GitHub Gist ID" }
     @{ Name = "TEST_GIST_TOKEN";   Sensitive = $true;  Description = "GitHub token for test gist updates" }
-    @{ Name = "AI_TEMPERATURE";    Sensitive = $false; Description = "AI temperature value (for example: 0.7)" }
+    @{ Name = "AI_TEMPERATURE";    Sensitive = $false; Description = "AI temperature value (for example: 0.3)" }
 )
 
 $envVars = @{}

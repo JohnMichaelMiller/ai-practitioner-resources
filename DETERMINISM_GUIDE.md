@@ -183,7 +183,7 @@ Watch these indicators in automation output:
 
 **Healthy metrics:**
 
-- Matched + Fuzzy matched = 8-15 resources (40-75% retention)
+- Exact matches + Fuzzy matches = 8-15 resources (40-75% retention)
 - Balanced mix of new and continuing resources
 - Few resources with `weeks_on_list > 5` (indicates true stability)
 

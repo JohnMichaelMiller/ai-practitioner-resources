@@ -93,7 +93,8 @@ Resource generation showed 85% turnover between runs (17 out of 20 resources cha
 
 ```
 🔄 Merging resources and updating weeks_on_list...
-   Matched resources: 3
+   Exact matches: 1
+   Fuzzy matches: 2
    New resources: 17
 ```
 
@@ -103,10 +104,9 @@ Resource generation showed 85% turnover between runs (17 out of 20 resources cha
 
 ```
 🔄 Merging resources and updating weeks_on_list...
-   Matched resources: 1
-   Fuzzy matched: 0
-   New resources: 19
-   Temperature: 0.3 (high determinism)
+   Exact matches: 4
+   Fuzzy matches: 3
+   New resources: 13
 ```
 
 **Initial Test**: Still seeing low matches, but this is expected on first run with new prompt
@@ -175,7 +175,7 @@ cp \tmp\merged-resources.json \tmp\run-$(date +%Y%m%d-%H%M%S).json
 diff \tmp\run-20260220-*.json \tmp\run-20260220-*.json
 
 # Check match statistics in output
-npm run test:merge | grep -E "(Matched|Fuzzy|New resources)"
+npm run test:merge | grep -E "(Exact matches|Fuzzy matches|New resources)"
 ```
 
 ## Related Documentation

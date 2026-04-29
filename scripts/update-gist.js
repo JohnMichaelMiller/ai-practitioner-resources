@@ -89,7 +89,19 @@ async function updateGist() {
   }
 
   const mergedResourcesText = fs.readFileSync(MERGED_RESOURCES_PATH, "utf8");
-  const mergedResourcesData = JSON.parse(mergedResourcesText);
+  let mergedResourcesData;
+  try {
+    mergedResourcesData = JSON.parse(mergedResourcesText);
+  } catch (error) {
+    console.error(
+      "❌ Error: Merged resources file contains invalid JSON at:",
+      MERGED_RESOURCES_PATH,
+    );
+    console.error(
+      "   Please run the validate step first (for example: `npm run validate`) before running `npm run update-gist`.",
+    );
+    process.exit(1);
+  }
   const timestamp = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
   const fullTimestamp = new Date().toISOString();
   const environment = IS_TEST_MODE ? "test" : "production";
