@@ -159,12 +159,14 @@ AI_TEMPERATURE=0.1  # Very low variance
 
 **Debug:**
 
-```javascript
-// In merge-and-update.js, add temporary logging inside the forEach:
-console.log(`Title similarity: ${titleSim}, URL similarity: ${urlSim}, score: ${score}`);
-console.log(`Match type: ${matchType}, best score: ${bestScore}`);
-```
+Temporarily add logging in `scripts/merge-and-update.js` for the values that actually exist in the current implementation, such as:
 
+- the computed title similarity
+- the computed URL similarity
+- the final match score
+- the selected `bestMatch` (if any)
+
+Avoid copying older examples that reference removed variables; use the current variable names from the matching loop instead.
 ## Monitoring
 
 Watch these indicators in automation output:
