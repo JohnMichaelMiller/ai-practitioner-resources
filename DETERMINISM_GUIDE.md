@@ -153,16 +153,16 @@ AI_TEMPERATURE=0.1  # Very low variance
 
 **Check:**
 
-1. Merge output shows "Matched resources" and "Fuzzy matched" counts
+1. Merge output shows "Exact matches" and "Fuzzy matches" counts
 2. Resource titles are consistent (check for typos)
 3. URLs normalize correctly (test with `normalizeUrl()` function)
 
 **Debug:**
 
 ```javascript
-// In merge-and-update.js, add logging:
-console.log(`Exact key: ${exactKey}`);
-console.log(`Normalized title: ${normalizedTitle}`);
+// In merge-and-update.js, add temporary logging inside the forEach:
+console.log(`Title similarity: ${titleSim}, URL similarity: ${urlSim}, score: ${score}`);
+console.log(`Match type: ${matchType}, best score: ${bestScore}`);
 ```
 
 ## Monitoring
@@ -173,10 +173,10 @@ Watch these indicators in automation output:
 🔄 Merging resources and updating weeks_on_list...
    Current resources: 20
    New resources: 20
-   Resources in map: 20
-   Matched resources: 5      ← Exact matches
-   Fuzzy matched: 3          ← Title-based matches
-   New resources: 12         ← Completely new
+   Exact matches: 5      ← Exact title + URL matches
+   Fuzzy matches: 3      ← Title-based matches
+   New resources: 12     ← Completely new
+✅ Resources merged successfully
 ```
 
 **Healthy metrics:**
