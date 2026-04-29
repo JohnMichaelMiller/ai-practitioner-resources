@@ -99,13 +99,14 @@ async function generateResources() {
 
       const currentCount = currentResources.resources.length;
       const targetCount = TARGET_RESOURCE_COUNT;
-      const minKeep = Math.floor(currentCount * 0.7); // Keep at least 70% of existing
-      const maxNew = targetCount - minKeep; // Remaining slots for new discoveries
+      const keepCount = Math.min(currentCount, targetCount);
+      const minKeep = Math.floor(keepCount * 0.7); // Keep at least 70% of the bounded current set
+      const maxNew = Math.max(0, targetCount - minKeep); // Remaining slots for new discoveries
 
       instruction = `You are an expert AI researcher maintaining and expanding a curated list of resources for developers. Generate ONLY valid JSON with no additional text.
 
 DISCOVERY MODE INSTRUCTIONS (Temperature: ${TEMPERATURE}):
-1) **MAINTAIN STABLE CORE**: Keep ${minKeep}-${currentCount} of the best resources from the current list
+1) **MAINTAIN STABLE CORE**: Keep ${minKeep}-${keepCount} of the best resources from the current list
 2) **DISCOVER NEW RESOURCES**: Add ${maxNew} new high-quality resources to reach ${targetCount} total
 3) **QUALITY OVER FAMILIARITY**: Replace existing resources if you find significantly better alternatives
 4) **CAST WIDE NET**: Explore diverse authoritative sources:
