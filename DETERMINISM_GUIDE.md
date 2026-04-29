@@ -167,6 +167,7 @@ Temporarily add logging in `scripts/merge-and-update.js` for the values that act
 - the selected `bestMatch` (if any)
 
 Avoid copying older examples that reference removed variables; use the current variable names from the matching loop instead.
+
 ## Monitoring
 
 Watch these indicators in automation output:

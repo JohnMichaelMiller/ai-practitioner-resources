@@ -165,13 +165,11 @@ function mergeAndUpdateResources() {
           newResource.source,
           currentResource.source,
         );
-
         // Scoring strategy:
         // - Exact title + exact URL = 2.0 (perfect match)
         // - High title similarity (0.9-1.0) + any URL match = good match
         // - Title similarity 0.8+ OR URL exact match = potential match
         let score = 0;
-
         if (titleSim === 1.0 && urlSim === 1.0) {
           score = 2.0; // Perfect match
         } else if (titleSim >= 0.9 && urlSim >= 0.7) {
@@ -183,7 +181,6 @@ function mergeAndUpdateResources() {
         } else if (titleSim >= 0.7 && urlSim === 1.0) {
           score = 1.2; // Decent title match + exact URL
         }
-
         if (score > bestScore) {
           bestScore = score;
           bestMatch = currentResource;
@@ -192,7 +189,6 @@ function mergeAndUpdateResources() {
           else matchType = "weak";
         }
       });
-
       // Accept match if score is high enough (1.2+)
       if (bestMatch && bestScore >= 1.2) {
         newResource.weeks_on_list = (bestMatch.weeks_on_list || 1) + 1;
