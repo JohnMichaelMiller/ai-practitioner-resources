@@ -140,7 +140,9 @@ function mergeAndUpdateResources() {
       ? currentResources.resources
       : [];
 
-  console.log(`   Current resources: ${currentResourcesArray.length}`);
+  console.log(
+    `   Current resources (match candidates): ${currentResourcesArray.length}`,
+  );
 
   // Update weeks_on_list for matching resources
   let exactMatched = 0;
