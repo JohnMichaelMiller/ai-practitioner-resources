@@ -12,35 +12,81 @@
 Write-Host "`n🔧 AI Practitioner Resources - Environment Setup" -ForegroundColor Cyan
 Write-Host "================================================`n" -ForegroundColor Cyan
 
-# Configuration values
-$envVars = @{
-    # See OneNote for details on how to get these values
-    "test"           = "test"
+function ConvertFrom-SecureStringToPlainText {
+    param(
+        [Parameter(Mandatory = $true)]
+        [Security.SecureString]$SecureString
+    )
+
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
+    try {
+        return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+    }
+    finally {
+        [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+    }
 }
 
-Write-Host "This will set the following environment variables permanently (User scope):" -ForegroundColor Yellow
-foreach ($key in $envVars.Keys) {
-    $value = $envVars[$key]
-    # Mask sensitive values for display
-    $displayValue = if ($value.Length -gt 20) {
-        $value.Substring(0, 10) + "..." + $value.Substring($value.Length - 10)
-    }
-    else {
-        $value
-    }
-    Write-Host "  $key = $displayValue" -ForegroundColor White
+# Environment variables required by the automation scripts
+$envVarDefinitions = @(
+    @{ Name = "OPENAI_API_KEY";    Sensitive = $true;  Description = "OpenAI API key for AI generation" }
+    @{ Name = "GITHUB_GIST_TOKEN"; Sensitive = $true;  Description = "GitHub personal access token with gist scope" }
+    @{ Name = "GIST_ID";           Sensitive = $false; Description = "Production GitHub Gist ID" }
+    @{ Name = "TEST_GIST_ID";      Sensitive = $false; Description = "Test GitHub Gist ID" }
+    @{ Name = "TEST_GIST_TOKEN";   Sensitive = $true;  Description = "GitHub token for test gist updates" }
+    @{ Name = "AI_TEMPERATURE";    Sensitive = $false; Description = "AI temperature value (for example: 0.7)" }
+)
+
+$envVars = @{}
+
+Write-Host "This script will configure the following environment variables permanently (User scope):" -ForegroundColor Yellow
+foreach ($definition in $envVarDefinitions) {
+    Write-Host "  $($definition.Name) - $($definition.Description)" -ForegroundColor White
 }
 
 Write-Host "`n⚠️  WARNING: This will permanently set these environment variables for your user account." -ForegroundColor Yellow
 Write-Host "   They will persist across PowerShell sessions and system restarts.`n" -ForegroundColor Yellow
 
-$confirmation = Read-Host "Do you want to proceed? (yes/no)"
+$confirmation = Read-Host "Do you want to continue to value entry? (yes/no)"
 
 if ($confirmation -ne "yes") {
     Write-Host "`n❌ Setup cancelled." -ForegroundColor Red
     exit 1
 }
 
+Write-Host "`n📝 Enter values for each environment variable:" -ForegroundColor Cyan
+foreach ($definition in $envVarDefinitions) {
+    if ($definition.Sensitive) {
+        $secureValue = Read-Host "  $($definition.Name)" -AsSecureString
+        $envVars[$definition.Name] = ConvertFrom-SecureStringToPlainText -SecureString $secureValue
+    }
+    else {
+        $envVars[$definition.Name] = Read-Host "  $($definition.Name)"
+    }
+}
+
+Write-Host "`nReview the values to be written:" -ForegroundColor Yellow
+foreach ($definition in $envVarDefinitions) {
+    $key = $definition.Name
+    $value = $envVars[$key]
+    if ([string]::IsNullOrEmpty($value)) {
+        $displayValue = "<empty>"
+    }
+    elseif ($definition.Sensitive) {
+        $displayValue = if ($value.Length -gt 8) { $value.Substring(0, 4) + "..." + $value.Substring($value.Length - 4) } else { "****" }
+    }
+    else {
+        $displayValue = $value
+    }
+
+    Write-Host "  $key = $displayValue" -ForegroundColor White
+}
+
+$finalConfirmation = Read-Host "`nWrite these values to your user environment? (yes/no)"
+if ($finalConfirmation -ne "yes") {
+    Write-Host "`n❌ Setup cancelled." -ForegroundColor Red
+    exit 1
+}
 Write-Host "`n📝 Setting environment variables..." -ForegroundColor Cyan
 
 $successCount = 0
