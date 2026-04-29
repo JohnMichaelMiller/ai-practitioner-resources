@@ -57,7 +57,21 @@ jobs:
             fi
           fi
 
-          echo "✅ Preflight passed: required secrets are present and GIST_ID format is valid."
+          echo "🔎 Checking Gist API access..."
+          STATUS=$(curl -sS -o /tmp/gist-preflight-response.json -w "%{http_code}" \
+            -H "Authorization: token ${GIST_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/gists/${GIST_ID}")
+
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Failed to access Gist ${GIST_ID} (HTTP status ${STATUS})."
+            echo "Possible fixes: rotate token, ensure token has gist scope, and verify GIST_ID is correct."
+            echo "--- response body ---"
+            cat /tmp/gist-preflight-response.json
+            exit 1
+          fi
+
+          echo "✅ Preflight passed: secrets are present and Gist is reachable."
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
