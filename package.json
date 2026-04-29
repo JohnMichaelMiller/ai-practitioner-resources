@@ -27,7 +27,7 @@
     "test-lifecycle-dry": "cross-env DRY_RUN=true node scripts/test-issue-lifecycle.js"
   },
   "dependencies": {
-    "ajv": "^8.12.0",
+    "ajv": "^8.20.0",
     "ajv-formats": "^2.1.1",
     "dotenv": "^17.3.1",
     "node-fetch": "^2.7.0"
