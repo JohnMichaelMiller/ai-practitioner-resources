@@ -29,7 +29,8 @@ function normalizeUrl(url) {
     .toLowerCase()
     .replace(/^https?:\/\//, "") // Remove protocol
     .replace(/^www\./, "") // Remove www
-    .replace(/\/+$/, ""); // Remove trailing slashes
+    .replace(/\/+$/, "") // Remove trailing slashes
+    .replace(/\/$/, ""); // Remove final slash
 }
 
 /**
