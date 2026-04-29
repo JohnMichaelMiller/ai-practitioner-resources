@@ -55,6 +55,11 @@ jobs:
               echo "Set GIST_ID to a raw gist ID or a valid gist URL."
               exit 1
             fi
+            GIST_ID=$(echo "${GIST_ID}" | grep -oE '[0-9a-fA-F]{32}')
+            if [ -z "${GIST_ID}" ]; then
+              echo "❌ Failed to extract gist ID from the provided URL."
+              exit 1
+            fi
           fi
 
           echo "🔎 Checking Gist API access..."
