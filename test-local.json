@@ -1,5 +1,5 @@
 {
-  "introduction": "A curated collection of the most valuable resources for developers looking to leverage AI for code generation, featuring practical guides on AI-powered coding tools, prompt engineering techniques, and integration strategies for modern software development workflows.",
+  "introduction": "<p>A curated collection of the most valuable resources for developers looking to leverage AI for code generation, featuring practical guides on AI-powered coding tools, prompt engineering techniques, and integration strategies for modern software development workflows.</p><p>Each resource is evaluated against the <strong>7 Principal Risks of AI-Assisted Coding</strong> — hover the colored icons on each card to see which risks it addresses:</p><ul><li>🛡️ <strong>Security Vulnerabilities</strong> — Design flaws and known vulnerabilities in AI-generated code</li><li>🧩 <strong>Logic &amp; Quality Issues</strong> — Semantically flawed code and inadequate error handling</li><li>🔐 <strong>Data Privacy Breaches</strong> — Unintended exposure of proprietary or sensitive data</li><li>⚖️ <strong>Licensing Complications</strong> — Accidental introduction of restrictive-licensed code</li><li>🛠️ <strong>Maintainability Challenges</strong> — Hard-to-explain code with poor documentation and traceability</li><li>🎭 <strong>Bias &amp; Inconsistent Standards</strong> — Outdated patterns, insecure defaults, style inconsistencies</li><li>🔗 <strong>Over-Reliance</strong> — Excessive dependency on AI reducing developer debugging abilities</li></ul>",
   "resources": [
     {
       "type": "Book",
@@ -7,7 +7,16 @@
       "source": "https://www.oreilly.com/library/view/ai-powered-development/9781098150976/",
       "score": 92,
       "weeks_on_list": 1,
-      "blurb": "Comprehensive guide to integrating AI coding assistants into development workflows with practical examples and best practices."
+      "blurb": "Comprehensive guide to integrating AI coding assistants into development workflows with practical examples and best practices.",
+      "risk_coverage": {
+        "security_vulnerabilities": 85,
+        "code_quality": 90,
+        "data_privacy": 75,
+        "licensing_ip": 80,
+        "maintainability": 88,
+        "bias_standards": 75,
+        "over_reliance": 82
+      }
     },
     {
       "type": "Article",
@@ -15,7 +24,16 @@
       "source": "https://docs.github.com/en/copilot/getting-started-with-github-copilot",
       "score": 88,
       "weeks_on_list": 2,
-      "blurb": "Official documentation providing step-by-step instructions for setting up and using GitHub Copilot effectively."
+      "blurb": "Official documentation providing step-by-step instructions for setting up and using GitHub Copilot effectively.",
+      "risk_coverage": {
+        "security_vulnerabilities": 70,
+        "code_quality": 82,
+        "data_privacy": "not_covered",
+        "licensing_ip": 75,
+        "maintainability": 78,
+        "bias_standards": "not_covered",
+        "over_reliance": 85
+      }
     },
     {
       "type": "Blog",
@@ -23,7 +41,16 @@
       "source": "https://martinfowler.com/articles/2023-chatgpt-xu-hao.html",
       "score": 91,
       "weeks_on_list": 1,
-      "blurb": "Martin Fowler's insights on leveraging ChatGPT and AI for software development with practical prompt strategies."
+      "blurb": "Martin Fowler's insights on leveraging ChatGPT and AI for software development with practical prompt strategies.",
+      "risk_coverage": {
+        "security_vulnerabilities": "not_covered",
+        "code_quality": 91,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 85,
+        "bias_standards": 80,
+        "over_reliance": 75
+      }
     },
     {
       "type": "Article",
@@ -31,7 +58,16 @@
       "source": "https://openai.com/blog/openai-codex",
       "score": 85,
       "weeks_on_list": 1,
-      "blurb": "OpenAI's official introduction to Codex capabilities and applications in automated code generation."
+      "blurb": "OpenAI's official introduction to Codex capabilities and applications in automated code generation.",
+      "risk_coverage": {
+        "security_vulnerabilities": 75,
+        "code_quality": 85,
+        "data_privacy": 80,
+        "licensing_ip": 70,
+        "maintainability": "not_covered",
+        "bias_standards": "not_covered",
+        "over_reliance": 78
+      }
     },
     {
       "type": "Podcast",
@@ -39,7 +75,16 @@
       "source": "https://softwareengineeringdaily.com/2021/07/20/github-copilot-with-mark-riedl/",
       "score": 82,
       "weeks_on_list": 1,
-      "blurb": "Deep dive into GitHub Copilot's architecture and implications for software development practices."
+      "blurb": "Deep dive into GitHub Copilot's architecture and implications for software development practices.",
+      "risk_coverage": {
+        "security_vulnerabilities": "not_covered",
+        "code_quality": 78,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 75,
+        "bias_standards": "not_covered",
+        "over_reliance": 82
+      }
     },
     {
       "type": "Book",
@@ -47,7 +92,16 @@
       "source": "https://www.manning.com/books/generative-ai-in-software-engineering",
       "score": 89,
       "weeks_on_list": 1,
-      "blurb": "Manning's practical approach to implementing generative AI tools throughout the software development lifecycle."
+      "blurb": "Manning's practical approach to implementing generative AI tools throughout the software development lifecycle.",
+      "risk_coverage": {
+        "security_vulnerabilities": 82,
+        "code_quality": 89,
+        "data_privacy": 78,
+        "licensing_ip": 75,
+        "maintainability": 85,
+        "bias_standards": 80,
+        "over_reliance": 76
+      }
     },
     {
       "type": "Article",
@@ -55,7 +109,16 @@
       "source": "https://stackoverflow.blog/2023/04/26/comparing-tag-trends-with-our-most-loved-programming-languages/",
       "score": 78,
       "weeks_on_list": 1,
-      "blurb": "Stack Overflow's analysis of developer trends and practices with AI-assisted coding tools."
+      "blurb": "Stack Overflow's analysis of developer trends and practices with AI-assisted coding tools.",
+      "risk_coverage": {
+        "security_vulnerabilities": 75,
+        "code_quality": 78,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 76,
+        "bias_standards": 72,
+        "over_reliance": "not_covered"
+      }
     },
     {
       "type": "Blog",
@@ -63,7 +126,16 @@
       "source": "https://github.blog/2022-09-07-research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/",
       "score": 90,
       "weeks_on_list": 1,
-      "blurb": "Research findings on GitHub Copilot's impact on developer productivity and coding practices."
+      "blurb": "Research findings on GitHub Copilot's impact on developer productivity and coding practices.",
+      "risk_coverage": {
+        "security_vulnerabilities": "not_covered",
+        "code_quality": 88,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 82,
+        "bias_standards": 78,
+        "over_reliance": 90
+      }
     },
     {
       "type": "Article",
@@ -71,7 +143,16 @@
       "source": "https://docs.aws.amazon.com/codewhisperer/latest/userguide/what-is-cwspr.html",
       "score": 84,
       "weeks_on_list": 2,
-      "blurb": "AWS documentation for CodeWhisperer AI coding assistant with integration examples and use cases."
+      "blurb": "AWS documentation for CodeWhisperer AI coding assistant with integration examples and use cases.",
+      "risk_coverage": {
+        "security_vulnerabilities": 84,
+        "code_quality": 80,
+        "data_privacy": 78,
+        "licensing_ip": 82,
+        "maintainability": "not_covered",
+        "bias_standards": "not_covered",
+        "over_reliance": "not_covered"
+      }
     },
     {
       "type": "Podcast",
@@ -79,7 +160,16 @@
       "source": "https://changelog.com/podcast/501",
       "score": 81,
       "weeks_on_list": 1,
-      "blurb": "Discussion of current AI development tools landscape and their impact on programming workflows."
+      "blurb": "Discussion of current AI development tools landscape and their impact on programming workflows.",
+      "risk_coverage": {
+        "security_vulnerabilities": "not_covered",
+        "code_quality": 78,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": "not_covered",
+        "bias_standards": "not_covered",
+        "over_reliance": 81
+      }
     },
     {
       "type": "Book",
@@ -87,7 +177,16 @@
       "source": "https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/",
       "score": 87,
       "weeks_on_list": 1,
-      "blurb": "Pragmatic approach to integrating AI tools while maintaining code quality and developer craftsmanship."
+      "blurb": "Pragmatic approach to integrating AI tools while maintaining code quality and developer craftsmanship.",
+      "risk_coverage": {
+        "security_vulnerabilities": 80,
+        "code_quality": 87,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 85,
+        "bias_standards": 78,
+        "over_reliance": 82
+      }
     },
     {
       "type": "Article",
@@ -95,7 +194,16 @@
       "source": "https://visualstudio.microsoft.com/vs/features/intellicode/",
       "score": 83,
       "weeks_on_list": 1,
-      "blurb": "Microsoft's AI-enhanced IntelliCode features for intelligent code completion and suggestions."
+      "blurb": "Microsoft's AI-enhanced IntelliCode features for intelligent code completion and suggestions.",
+      "risk_coverage": {
+        "security_vulnerabilities": 75,
+        "code_quality": 83,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 78,
+        "bias_standards": "not_covered",
+        "over_reliance": 76
+      }
     },
     {
       "type": "Blog",
@@ -103,7 +211,16 @@
       "source": "https://www.tabnine.com/blog/ai-code-completion-guide/",
       "score": 79,
       "weeks_on_list": 1,
-      "blurb": "Comprehensive guide to AI-powered code completion techniques and implementation strategies."
+      "blurb": "Comprehensive guide to AI-powered code completion techniques and implementation strategies.",
+      "risk_coverage": {
+        "security_vulnerabilities": "not_covered",
+        "code_quality": 79,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 75,
+        "bias_standards": "not_covered",
+        "over_reliance": 72
+      }
     },
     {
       "type": "Article",
@@ -111,7 +228,16 @@
       "source": "https://ai.googleblog.com/2022/07/ml-enhanced-code-completion-improves.html",
       "score": 86,
       "weeks_on_list": 1,
-      "blurb": "Google's research on machine learning enhanced code completion and developer productivity improvements."
+      "blurb": "Google's research on machine learning enhanced code completion and developer productivity improvements.",
+      "risk_coverage": {
+        "security_vulnerabilities": "not_covered",
+        "code_quality": 86,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 80,
+        "bias_standards": 75,
+        "over_reliance": "not_covered"
+      }
     },
     {
       "type": "Podcast",
@@ -119,7 +245,16 @@
       "source": "https://www.programmingthrowdown.com/",
       "score": 77,
       "weeks_on_list": 1,
-      "blurb": "Practical discussion of AI tools integration in real-world software development environments."
+      "blurb": "Practical discussion of AI tools integration in real-world software development environments.",
+      "risk_coverage": {
+        "security_vulnerabilities": "not_covered",
+        "code_quality": 75,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": "not_covered",
+        "bias_standards": "not_covered",
+        "over_reliance": 77
+      }
     },
     {
       "type": "Book",
@@ -127,7 +262,16 @@
       "source": "https://www.microsoftpressstore.com/store/code-complete-9780735619678",
       "score": 88,
       "weeks_on_list": 1,
-      "blurb": "Updated classic incorporating AI-assisted development practices with traditional software construction principles."
+      "blurb": "Updated classic incorporating AI-assisted development practices with traditional software construction principles.",
+      "risk_coverage": {
+        "security_vulnerabilities": 82,
+        "code_quality": 88,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 88,
+        "bias_standards": 85,
+        "over_reliance": 80
+      }
     },
     {
       "type": "Article",
@@ -135,7 +279,16 @@
       "source": "https://huggingface.co/docs/transformers/tasks/code_generation",
       "score": 85,
       "weeks_on_list": 1,
-      "blurb": "Technical documentation for implementing and fine-tuning transformer models for code generation tasks."
+      "blurb": "Technical documentation for implementing and fine-tuning transformer models for code generation tasks.",
+      "risk_coverage": {
+        "security_vulnerabilities": 75,
+        "code_quality": 85,
+        "data_privacy": 78,
+        "licensing_ip": 72,
+        "maintainability": "not_covered",
+        "bias_standards": 80,
+        "over_reliance": "not_covered"
+      }
     },
     {
       "type": "Blog",
@@ -143,7 +296,16 @@
       "source": "https://blog.jetbrains.com/idea/2023/06/ai-assistant-in-jetbrains-ides-all-you-need-to-know/",
       "score": 82,
       "weeks_on_list": 1,
-      "blurb": "JetBrains' approach to integrating AI assistance across their IDE ecosystem with practical examples."
+      "blurb": "JetBrains' approach to integrating AI assistance across their IDE ecosystem with practical examples.",
+      "risk_coverage": {
+        "security_vulnerabilities": "not_covered",
+        "code_quality": 82,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 80,
+        "bias_standards": 75,
+        "over_reliance": 78
+      }
     },
     {
       "type": "Article",
@@ -151,7 +313,16 @@
       "source": "https://ethicalml.ai/2023/02/ai-code-generation-ethics/",
       "score": 80,
       "weeks_on_list": 1,
-      "blurb": "Important considerations for responsible use of AI in code generation including security and licensing issues."
+      "blurb": "Important considerations for responsible use of AI in code generation including security and licensing issues.",
+      "risk_coverage": {
+        "security_vulnerabilities": 80,
+        "code_quality": 75,
+        "data_privacy": 80,
+        "licensing_ip": 80,
+        "maintainability": 72,
+        "bias_standards": 80,
+        "over_reliance": 78
+      }
     },
     {
       "type": "Podcast",
@@ -159,7 +330,16 @@
       "source": "https://developertea.com/episodes/ai-assisted-development-with-github-copilot",
       "score": 76,
       "weeks_on_list": 1,
-      "blurb": "Focused discussion on practical AI coding tool adoption and developer workflow integration strategies."
+      "blurb": "Focused discussion on practical AI coding tool adoption and developer workflow integration strategies.",
+      "risk_coverage": {
+        "security_vulnerabilities": "not_covered",
+        "code_quality": 72,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": "not_covered",
+        "bias_standards": "not_covered",
+        "over_reliance": 76
+      }
     }
   ],
   "legend": "<h4>📊 Resource Scoring System</h4><ul><li><strong>🟢 90-100:</strong> Excellent - Top-tier resources with exceptional practical value</li><li><strong>🟡 75-89:</strong> Good - Solid, useful resources with strong practical application</li><li><strong>🔴 0-74:</strong> Fair - Less practical or more theoretical resources</li></ul><h5>Scoring Criteria:</h5><ul><li><strong>Practical Value (40%):</strong> Hands-on coding techniques and real-world application</li><li><strong>Clarity (25%):</strong> Accessibility and ease of understanding</li><li><strong>Depth (20%):</strong> Comprehensive coverage of topics</li><li><strong>Relevance (15%):</strong> Currency and applicability to modern development</li></ul>",
