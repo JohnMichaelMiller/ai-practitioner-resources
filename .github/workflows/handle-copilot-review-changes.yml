@@ -73,7 +73,7 @@ jobs:
           script: |
             const fs = require('fs');
             const sessionId = '${{ steps.extract_session.outputs.session_id }}';
-            const headRef = '${{ github.event.pull_request.head.ref }}';
+            const headRef = context.payload.pull_request.head.ref;
             const sessionFile = `.github/sessions/${sessionId}.json`;
 
             // Validate sessionId matches expected pattern before use in shell commands
