@@ -8,7 +8,7 @@ on:
 permissions:
   pull-requests: write
   issues: write
-  contents: read
+  contents: write
 
 jobs:
   handle_changes_requested:
@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Extract session ID from PR
         id: extract_session
@@ -71,7 +73,14 @@ jobs:
           script: |
             const fs = require('fs');
             const sessionId = '${{ steps.extract_session.outputs.session_id }}';
+            const headRef = '${{ github.head_ref }}';
             const sessionFile = `.github/sessions/${sessionId}.json`;
+
+            // Validate sessionId matches expected pattern before use in shell commands
+            if (!/^copilot-issue-\d+-pr-\d+$/.test(sessionId)) {
+              core.warning(`Unexpected session ID format: ${sessionId}. Skipping session file update.`);
+              return;
+            }
 
             if (fs.existsSync(sessionFile)) {
               const session = JSON.parse(fs.readFileSync(sessionFile, 'utf8'));
@@ -88,12 +97,24 @@ jobs:
               // Save updated session
               fs.writeFileSync(sessionFile, JSON.stringify(session, null, 2));
 
-              // Commit update
-              exec('git config user.name "github-actions[bot]"');
-              exec('git config user.email "github-actions[bot]@users.noreply.github.com"');
-              exec(`git add ${sessionFile}`);
-              exec(`git commit -m "session: update with review feedback for ${sessionId}"`);
-              exec(`git push origin ${{ github.head_ref }}`);
+              // Commit update using spawnSync to avoid shell injection when passing arguments
+              const { spawnSync } = require('child_process');
+              const run = (cmd, args) => {
+                const result = spawnSync(cmd, args, { encoding: 'utf8' });
+                if (result.status !== 0) {
+                  throw new Error(`Command '${cmd} ${args.join(' ')}' failed (exit ${result.status}): ${result.stderr}`);
+                }
+                return result;
+              };
+              try {
+                run('git', ['config', 'user.name', 'github-actions[bot]']);
+                run('git', ['config', 'user.email', 'github-actions[bot]@users.noreply.github.com']);
+                run('git', ['add', sessionFile]);
+                run('git', ['commit', '-m', `session: update with review feedback for ${sessionId}`]);
+                run('git', ['push', 'origin', `HEAD:${headRef}`]);
+              } catch (err) {
+                core.warning(`Failed to commit session update: ${err.message}`);
+              }
             }
 
       - name: Add label for Copilot attention
