@@ -65,7 +65,7 @@ export function renderResourceCard(resource) {
               : ""
           }
           <div class="weeks-badge-header" style="border-color: ${getWeeksBadgeColor(
-            resource.weeks_on_list || 1,
+            resource.weeks_on_list || 1
           )}; color: ${getWeeksBadgeColor(resource.weeks_on_list || 1)}">${
             resource.weeks_on_list || 1
           } week${resource.weeks_on_list !== 1 ? "s" : ""}</div>
