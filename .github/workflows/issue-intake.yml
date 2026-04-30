@@ -41,11 +41,11 @@ jobs:
         run: node scripts/issue-intake.js
 
       - name: Copilot PM review (AI)
+        continue-on-error: true
         env:
           TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          PM_MODEL: claude-sonnet-4-20250514
         run: node scripts/pm-review.js

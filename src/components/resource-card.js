@@ -21,7 +21,7 @@ function buildRiskBadges(riskCoverage) {
     .map((area) => {
       const score = riskCoverage[area.key];
       const scoreColor = getScoreColor(score);
-      return `<div class="individual-risk-score" style="background-color: ${scoreColor}">${score}<div class="tooltip">${area.tooltip} - Score: ${score}/100</div></div>`;
+      return `<div class="individual-risk-score" style="background-color: ${scoreColor}">${area.icon}<div class="tooltip">${area.label}: ${area.tooltip.split(":")[0]} — Score: ${score}/100</div></div>`;
     })
     .join("");
 
@@ -57,8 +57,8 @@ export function renderResourceCard(resource) {
       <div class="resource-header">
         <div class="resource-type-container">
           <span class="resource-type type-${resource.type.toLowerCase()}">${
-    resource.type
-  }</span>
+            resource.type
+          }</span>
           ${
             resource.weeks_on_list === 1
               ? '<span class="new-tag">NEW</span>'
@@ -67,8 +67,8 @@ export function renderResourceCard(resource) {
           <div class="weeks-badge-header" style="border-color: ${getWeeksBadgeColor(
             resource.weeks_on_list || 1
           )}; color: ${getWeeksBadgeColor(resource.weeks_on_list || 1)}">${
-    resource.weeks_on_list || 1
-  } week${resource.weeks_on_list !== 1 ? "s" : ""}</div>
+            resource.weeks_on_list || 1
+          } week${resource.weeks_on_list !== 1 ? "s" : ""}</div>
         </div>
         <div class="score-header-container">
           <div class="score-header" style="background-color: ${scoreColor}">${mainScore}</div>

@@ -22,10 +22,10 @@ Visit the live viewer at: **https://j0hnnymiller.github.io/ai-practitioner-resou
 
 1. **Fork this repository**
 2. **Create a GitHub Gist** with your resources JSON file
-3. **Update the configuration** in `index.html`:
+3. **Update the configuration** in `src/utils/constants.js`:
    ```javascript
-   const GIST_CONFIG = {
-     url: "https://gist.githubusercontent.com/yourusername/gistid/raw/resources.json",
+   export const GIST_CONFIG = {
+     url: "https://gist.githubusercontent.com/yourusername/gistid/raw/resources.prod.json",
    };
    ```
 4. **Enable GitHub Pages** in your repository settings
@@ -34,9 +34,18 @@ Visit the live viewer at: **https://j0hnnymiller.github.io/ai-practitioner-resou
 
 ```
 ai-practitioner-resources/
-├── index.html                          # Main web viewer
-├── resources.schema.json                         # JSON schema for validation
+├── index.html                          # Main web viewer (HTML shell)
+├── styles.css                          # Application stylesheet
+├── resources.schema.json               # JSON schema for validation
 ├── package.json                        # Node.js dependencies
+├── test-local.json                     # Local test data
+├── src/                                # Modular JavaScript application
+│   ├── app.js                          # Application entry point
+│   ├── components/                     # UI rendering components
+│   ├── core/                           # Colors, data processing
+│   ├── services/                       # Data fetching
+│   └── utils/
+│       └── constants.js                # GIST_CONFIG, RISK_AREAS definitions
 ├── .github/
 │   ├── workflows/
 │   │   └── weekly-ai-resources-update.yml  # Automated weekly updates
@@ -140,7 +149,16 @@ Resources follow this comprehensive schema:
       "source": "https://example.com",
       "score": 95,
       "weeks_on_list": 1,
-      "blurb": "Brief description of the resource's value..."
+      "blurb": "Brief description of the resource's value...",
+      "risk_coverage": {
+        "security_vulnerabilities": 90,
+        "code_quality": 75,
+        "data_privacy": "not_covered",
+        "licensing_ip": "not_covered",
+        "maintainability": 80,
+        "bias_standards": "not_covered",
+        "over_reliance": 70
+      }
     }
   ],
   "legend": "<div>HTML scoring system legend</div>",
@@ -152,13 +170,13 @@ Resources follow this comprehensive schema:
 
 Resources are evaluated based on their ability to address the **7 Principal Risks of AI-Assisted Coding**:
 
-1. **Security Vulnerabilities** - Design flaws and known vulnerabilities in AI-generated code
-2. **Logic & Quality Issues** - Semantically flawed code and inadequate error handling
-3. **Data Leakage & Confidentiality** - Unintended exposure of proprietary or sensitive data
-4. **Licensing & IP Concerns** - Accidental introduction of restrictive-licensed code
-5. **Maintainability & Traceability** - Hard-to-explain "black box" code with poor documentation
-6. **Bias & Inconsistent Standards** - Outdated patterns, insecure defaults, style inconsistencies
-7. **Over-Reliance & Skill Atrophy** - Excessive dependency reducing debugging abilities
+1. 🛡️ **Security Vulnerabilities** - Design flaws and known vulnerabilities in AI-generated code
+2. 🧩 **Logic & Quality Issues** - Semantically flawed code and inadequate error handling
+3. 🔐 **Data Privacy Breaches** - Unintended exposure of proprietary or sensitive data
+4. ⚖️ **Licensing Complications** - Accidental introduction of restrictive-licensed code
+5. 🛠️ **Maintainability Challenges** - Hard-to-explain "black box" code with poor documentation
+6. 🎭 **Bias & Inconsistent Standards** - Outdated patterns, insecure defaults, style inconsistencies
+7. 🔗 **Over-Reliance** - Excessive dependency reducing debugging abilities
 
 Each resource is scored 60-100 on individual risk areas it addresses, or marked "not_covered". Resources are selected based on their **highest individual risk area score**, ensuring practical risk mitigation value.
 
@@ -225,7 +243,8 @@ New resource types automatically receive:
 For enhanced control, use the GitHub API:
 
 ```javascript
-const GIST_CONFIG = {
+// In src/utils/constants.js
+export const GIST_CONFIG = {
   apiUrl: "https://api.github.com/gists/your-gist-id",
   filename: "resources.json",
 };
@@ -243,9 +262,9 @@ Validate your JSON against `resources.schema.json` to ensure compatibility:
 ### Development Workflow
 
 1. **Generate Content**: Use AI prompt to create resource list
-2. **Validate**: Check against JSON schema
-3. **Test Locally**: Open `index.html` in browser
-4. **Deploy**: Update gist and push to GitHub Pages
+2. **Validate**: Check against JSON schema (`npm run validate`)
+3. **Test Locally**: Point `GIST_CONFIG` in `src/utils/constants.js` to `./test-local.json`, then serve with `python -m http.server 8080` and open `http://localhost:8080`
+4. **Deploy**: Restore production URL in `GIST_CONFIG`, then update gist and push to GitHub Pages
 
 ## 📊 Analytics & Insights
 
