@@ -69,11 +69,13 @@ jobs:
       - name: Update session with review feedback
         if: steps.extract_session.outputs.session_id != ''
         uses: actions/github-script@v7
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         with:
           script: |
             const fs = require('fs');
             const sessionId = '${{ steps.extract_session.outputs.session_id }}';
-            const headRef = context.payload.pull_request.head.ref;
+            const headRef = process.env.HEAD_REF || '';
             const sessionFile = `.github/sessions/${sessionId}.json`;
 
             // Validate sessionId matches expected pattern before use in shell commands
