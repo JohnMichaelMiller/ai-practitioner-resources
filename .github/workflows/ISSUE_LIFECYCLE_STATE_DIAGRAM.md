@@ -256,8 +256,8 @@ stateDiagram-v2
 | State                 | Label | Type         | Meaning                   | Exit Criteria                                         | Code Reference |
 | --------------------- | ----- | ------------ | ------------------------- | ----------------------------------------------------- | -------------- |
 | **Validation_Failed** | ⚠️    | Intermediate | Missing required fields   | Needs_Details                                         | Issue templates: `.github/ISSUE_TEMPLATE/*.yml` |
-| **Needs_Details**     | 📝    | Waiting      | Awaiting user updates     | Auto_Validation (updated) or Auto_Abandoned (30 days) | Manual process (no automation) |
-| **Auto_Abandoned**    | ❌    | Terminal     | Auto-closed (no response) | End                                                   | Not implemented (planned) |
+| **Needs_Details**     | 📝    | Waiting      | Awaiting user updates     | Auto_Validation (updated) or Auto_Abandoned (30 days) | `re-validate-needs-details.yml` (on issue edit/comment) |
+| **Auto_Abandoned**    | ❌    | Terminal     | Auto-closed (no response) | End                                                   | `auto-abandon.yml` (30-day stale check) |
 
 ### Backlog & Triage States
 
@@ -789,8 +789,8 @@ Architecture aligned?
 | ------------------------ | -------------------------- | -----------------------: | -------: | -------------- |
 | **Issue_Created**        | **Auto_Validation**        |                Immediate |    0 min | `issue-intake.yml:6-7` (trigger) |
 | **Validation_Failed**    | **Needs_Details**          |                Immediate |    0 min | Issue templates |
-| **Needs_Details**        | **Auto_Validation**        |      User submits update | Variable | Re-trigger on edit |
-| **Needs_Details**        | **Auto_Abandoned**         | 30 days with no response |  30 days | Not implemented |
+| **Needs_Details**        | **Auto_Validation**        |      User submits update | Variable | `re-validate-needs-details.yml` (issue edit/comment) |
+| **Needs_Details**        | **Auto_Abandoned**         | 30 days with no response |  30 days | `auto-abandon.yml` (daily stale check) |
 | **Backlog**              | **PM_Triage**              |                PM review |    Hours | `issue-intake.yml:42-51` |
 | **Auto_Validation (✅)** | **Backlog**                |          All checks pass |    0 min | `issue-intake.js:200-250` |
 | **Stage_2_AI_Review**    | **AI_Comments**            |             Issues found |  Minutes | `ai-code-review.yml:200-300` |
@@ -857,6 +857,8 @@ Architecture aligned?
 | **issue-intake.yml** | Issue creation trigger and PM review | 1-51 | Issue_Created → Auto_Validation → PM_Triage |
 | **rebalance-on-close.yml** | Lane rebalancing on issue close | 1-37 | Lane transitions (In_Hole → On_Deck → At_Bat) |
 | **ai-code-review.yml** | Multi-stage PR review process | 1-403 | Stage_1 through Stage_6 (all PR gates) |
+| **auto-abandon.yml** | Auto-close stale needs-details issues | 1-67 | Needs_Details → Auto_Abandoned (30-day timeout) |
+| **re-validate-needs-details.yml** | Re-queue issue for validation on update | 1-64 | Needs_Details → Auto_Validation (user edit/comment) |
 
 ### Core Scripts (`scripts/`)
 

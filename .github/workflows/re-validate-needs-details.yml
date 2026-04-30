@@ -1,0 +1,64 @@
+name: Re-Validate Needs-Details Issue
+
+# Implements the Needs_Details --> Auto_Validation transition from the issue lifecycle state machine.
+# When a user updates an issue (edits the body or adds a comment) that carries the 'needs-details'
+# label, the label is removed to re-queue the issue for automated validation.
+# Reference: .github/workflows/ISSUE_LIFECYCLE_STATE_DIAGRAM.md
+
+on:
+  issues:
+    types: [edited]
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+jobs:
+  re-validate:
+    runs-on: ubuntu-latest
+    # Only act when:
+    #   1. The issue is still open
+    #   2. It carries the 'needs-details' label (Needs_Details state)
+    #   3. The event is on a real issue, not a pull request
+    #   4. The sender is not a bot (avoids acting on automated comments/edits)
+    if: >
+      github.event.issue.state == 'open' &&
+      contains(github.event.issue.labels.*.name, 'needs-details') &&
+      github.event.issue.pull_request == null &&
+      github.event.sender.type != 'Bot'
+    steps:
+      - name: Remove needs-details label and re-queue for validation
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+            const { owner, repo } = context.repo;
+
+            // Remove the needs-details label (lifecycle transition: Needs_Details --> Auto_Validation)
+            try {
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                name: 'needs-details',
+              });
+              console.log(`Removed 'needs-details' label from issue #${issueNumber}`);
+            } catch (err) {
+              // Label may not be present or was already removed — not a fatal error
+              console.log(`Note: could not remove 'needs-details' label: ${err.message}`);
+            }
+
+            // Post an acknowledgement so the submitter knows their update was received
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body: [
+                '**Update Received** 🔄',
+                '',
+                'Thank you for the update! This issue has been re-queued for automated validation.',
+                '',
+                '> **Lifecycle transition**: `Needs_Details → Auto_Validation`',
+              ].join('\n'),
+            });
