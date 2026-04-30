@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Extract session ID from PR
         id: extract_session
@@ -73,7 +73,7 @@ jobs:
           script: |
             const fs = require('fs');
             const sessionId = '${{ steps.extract_session.outputs.session_id }}';
-            const headRef = '${{ github.head_ref }}';
+            const headRef = '${{ github.event.pull_request.head.ref }}';
             const sessionFile = `.github/sessions/${sessionId}.json`;
 
             // Validate sessionId matches expected pattern before use in shell commands
