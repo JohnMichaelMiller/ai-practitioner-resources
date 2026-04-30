@@ -107,8 +107,8 @@ function cmpIssues(a, b) {
 }
 
 async function ghFetch(url, opts = {}) {
-  const token = process.env.GITHUB_TOKEN || process.env.TOKEN;
-  if (!token) throw new Error("GITHUB_TOKEN not set");
+  const token = process.env.TOKEN || process.env.GITHUB_TOKEN;
+  if (!token) throw new Error("TOKEN/GITHUB_TOKEN not set");
   const base = process.env.GITHUB_API_URL || "https://api.github.com";
   const res = await fetch(base + url, {
     ...opts,
@@ -130,8 +130,8 @@ async function ghFetch(url, opts = {}) {
 
 // GraphQL helpers for Projects v2
 async function ghGraphQL(query, variables) {
-  const token = process.env.GITHUB_TOKEN || process.env.TOKEN;
-  if (!token) throw new Error("GITHUB_TOKEN not set");
+  const token = process.env.TOKEN || process.env.GITHUB_TOKEN;
+  if (!token) throw new Error("TOKEN/GITHUB_TOKEN not set");
   const url =
     process.env.GITHUB_GRAPHQL_URL || "https://api.github.com/graphql";
   const res = await fetch(url, {

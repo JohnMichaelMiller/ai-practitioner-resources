@@ -27,6 +27,8 @@ jobs:
 
       - name: Rebalance Project Status
         env:
+          # Use a PAT that can access user-level Projects v2 (GITHUB_TOKEN cannot for user-owned projects)
+          TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PROJECT_OWNER: ${{ github.repository_owner }}
