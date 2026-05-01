@@ -121,11 +121,11 @@ jobs:
 
             const failures = [];
 
-            // 1. Title follows type: description convention (case-insensitive)
-            const validTypes = ['fix', 'feat', 'chore', 'docs', 'refactor', 'test', 'style', 'perf'];
+            // 1. Title follows category: description convention (case-insensitive)
+            const validTypes = ['fix', 'feat', 'feature', 'chore', 'docs', 'refactor', 'test', 'style', 'perf'];
             const titleRegex = new RegExp(`^(${validTypes.join('|')}):`, 'i');
             if (!titleRegex.test(title)) {
-              failures.push(`❌ **PR title** must follow \`type: description\` format (e.g. \`feat: add login page\`). Valid types (case-insensitive): ${validTypes.map(t => `\`${t}\``).join(', ')}.`);
+              failures.push(`❌ **PR title** must follow \`type: description\` format (e.g. \`feature: add login page\`). Valid types (case-insensitive): ${validTypes.map(t => `\`${t}\``).join(', ')}.`);
             }
 
             // 2. Body is not empty and >= 100 chars
