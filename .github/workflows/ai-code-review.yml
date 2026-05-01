@@ -315,6 +315,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write
 
     # Only run if review wasn't escalated
     if: success()
@@ -323,37 +324,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run acceptance criteria tests
-        id: criteria
-        run: |
-          # Placeholder: Run acceptance criteria tests
-          # In real implementation, this would:
-          # 1. Read issue requirements from PR description
-          # 2. Run relevant tests
-          # 3. Verify each criterion
-
-          echo "criteria_passed=true" >> $GITHUB_OUTPUT
-          echo "All acceptance criteria verified"
-
-      - name: Post verification comment
-        uses: actions/github-script@v7
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          script: |
-            const message = `## ✅ Acceptance Criteria Verification\n\n`;
-            message += `All acceptance criteria from the issue have been verified.\n\n`;
-            message += `- ✅ Feature works as specified\n`;
-            message += `- ✅ Edge cases handled\n`;
-            message += `- ✅ Error conditions managed\n`;
-            message += `- ✅ Data validation present\n`;
-            message += `- ✅ API integration correct\n\n`;
-            message += `Ready for CI/CD checks.`;
+          node-version: "18"
 
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: message,
-            });
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check acceptance criteria (Stage 3)
+        id: criteria
+        run: node scripts/ac-check.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
 
   ci-checks:
     name: 🔍 CI/CD Checks
