@@ -207,11 +207,15 @@ function extractLinkedIssueNumber(body) {
 function extractAcceptanceCriteria(issueBody) {
   if (!issueBody) return null;
   const match = issueBody.match(
-    /##\s*Acceptance Criteria\s*\n([\s\S]*?)(?=\n##|$)/i
+    /##\s*Acceptance Criteria\s*\r?\n([\s\S]*?)(?=\r?\n##|$)/i
   );
-  return match ? match[1].trim() : null;
+  if (!match) return null;
+  const criteria = match[1].trim();
+  return criteria || null;
 }
 
+module.exports.extractLinkedIssueNumber = extractLinkedIssueNumber;
+module.exports.extractAcceptanceCriteria = extractAcceptanceCriteria;
 function readProjectConventions() {
   const conventionsPath = path.resolve(
     process.cwd(),
