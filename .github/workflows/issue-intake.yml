@@ -28,6 +28,7 @@ jobs:
         run: npm ci --omit=dev
 
       - name: Initialize intake
+        id: intake
         env:
           # Use a PAT that can access user-level Projects v2 (GITHUB_TOKEN cannot for user-owned projects)
           TOKEN: ${{ secrets.PROJECTS_TOKEN }}
@@ -41,6 +42,7 @@ jobs:
         run: node scripts/issue-intake.js
 
       - name: Copilot PM review (AI)
+        if: "!contains(steps.intake.outputs.labels, 'needs-details')"
         continue-on-error: true
         env:
           TOKEN: ${{ secrets.PROJECTS_TOKEN }}

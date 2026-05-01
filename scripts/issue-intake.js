@@ -1,8 +1,7 @@
 // Issue intake on open: initialize Project 1 Status and request approval.
 // - Ensure the issue is added to Project 1 (owner/number via env)
 // - Set Project Status to the bench value (default: "on the bench" or mapped)
-// - Add tracking label "needs-approval" unless already implementation-ready
-// - Post a short comment with the review checklist and quick approval commands
+// - Apply "needs-details" when issue quality thresholds are not met
 
 const fs = require("fs");
 const fetch = require("node-fetch");
@@ -169,6 +168,22 @@ function stripLaneLabels(nameSet) {
   return new Set([...nameSet].filter((n) => !lowerLanes.has(n.toLowerCase())));
 }
 
+function assessIssueDetails(body) {
+  const text = typeof body === "string" ? body : "";
+  const trimmed = text.trim();
+  const hasBody = trimmed.length > 0;
+  const hasMinLength = trimmed.length > 50;
+  const hasHeading = /(^|\n)\s*##\s+\S+/.test(text);
+  const hasCheckbox = /(^|\n)\s*-\s\[[ xX]\]/.test(text);
+  const hasStructuredContent = hasHeading || hasCheckbox;
+  return {
+    passed: hasBody && hasMinLength && hasStructuredContent,
+    hasBody,
+    hasMinLength,
+    hasStructuredContent,
+  };
+}
+
 async function setIssueLabels(owner, repo, number, names) {
   await ghFetch(`/repos/${owner}/${repo}/issues/${number}`, {
     method: "PATCH",
@@ -273,15 +288,65 @@ async function main() {
 
   // Remove any legacy lane labels if present
   let newSet = stripLaneLabels(labelSet);
+  const detailsAssessment = assessIssueDetails(issue.body);
+  const hadNeedsDetails = [...newSet].some(
+    (label) => label.toLowerCase() === "needs-details"
+  );
 
-  // Do not auto-apply 'needs-approval'. The PM review step will decide labels.
+  if (!detailsAssessment.passed) {
+    await ensureLabel(
+      owner,
+      repo,
+      "needs-details",
+      "d93f0b",
+      "Issue lacks required detail for implementation"
+    );
+    newSet.add("needs-details");
+    if (!hadNeedsDetails) {
+      const missing = [];
+      if (!detailsAssessment.hasBody) missing.push("- Add a non-empty issue body.");
+      if (!detailsAssessment.hasMinLength)
+        missing.push("- Expand the issue body to more than 50 characters.");
+      if (!detailsAssessment.hasStructuredContent) {
+        missing.push(
+          "- Include at least one section heading (`##`) or one checklist item (`- [ ]`)."
+        );
+      }
+      await addComment(
+        owner,
+        repo,
+        number,
+        `Thanks for opening this issue. I added the \`needs-details\` label because it is missing required intake detail:\n\n${missing.join(
+          "\n"
+        )}\n\nUpdate the issue body and this intake workflow will re-run automatically.`
+      );
+    }
+  } else {
+    newSet = new Set(
+      [...newSet].filter((label) => label.toLowerCase() !== "needs-details")
+    );
+  }
 
-  await setIssueLabels(owner, repo, number, [...newSet]);
+  const appliedLabels = [...newSet];
+  await setIssueLabels(owner, repo, number, appliedLabels);
+  if (process.env.GITHUB_OUTPUT) {
+    fs.appendFileSync(
+      process.env.GITHUB_OUTPUT,
+      `labels=${appliedLabels.join(",")}\n`,
+      "utf8"
+    );
+  }
 
   console.log(`#${number} intake completed (labels applied).`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  main().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = {
+  assessIssueDetails,
+};
