@@ -301,6 +301,9 @@ async function main() {
       "d93f0b",
       "Issue lacks required detail for implementation"
     );
+    newSet = new Set(
+      [...newSet].filter((label) => label.toLowerCase() !== "needs-details")
+    );
     newSet.add("needs-details");
     if (!hadNeedsDetails) {
       const missing = [];
@@ -332,7 +335,9 @@ async function main() {
   if (process.env.GITHUB_OUTPUT) {
     fs.appendFileSync(
       process.env.GITHUB_OUTPUT,
-      `labels=${appliedLabels.join(",")}\n`,
+      `labels=${appliedLabels.join(",")}\nlabels_json=${JSON.stringify(
+        appliedLabels
+      )}\n`,
       "utf8"
     );
   }

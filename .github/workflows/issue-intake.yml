@@ -42,7 +42,7 @@ jobs:
         run: node scripts/issue-intake.js
 
       - name: Copilot PM review (AI)
-        if: "!contains(steps.intake.outputs.labels, 'needs-details')"
+        if: "!contains(fromJSON(steps.intake.outputs.labels_json || '[]'), 'needs-details')"
         continue-on-error: true
         env:
           TOKEN: ${{ secrets.PROJECTS_TOKEN }}
