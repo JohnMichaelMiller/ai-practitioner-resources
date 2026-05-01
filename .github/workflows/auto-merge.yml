@@ -1,0 +1,85 @@
+name: Auto-Merge on Approval
+
+# Triggered when a pull request review is submitted
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  auto-merge:
+    name: 🚀 Auto-Merge Approved PR
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    # Only run when the review state is 'approved'
+    if: github.event.review.state == 'approved'
+
+    steps:
+      - name: Merge PR, update labels, and post comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const reviewer = context.payload.review.user.login;
+
+            // Squash-merge the approved PR
+            let sha;
+            try {
+              const result = await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                merge_method: 'squash',
+              });
+              sha = result.data.sha;
+              console.log(`Merged PR #${prNumber} with commit SHA: ${sha}`);
+            } catch (e) {
+              core.setFailed(`Failed to merge PR #${prNumber}: ${e.message}`);
+              return;
+            }
+
+            // Remove awaiting-approval label (ignore 404 if not present)
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                name: 'awaiting-approval',
+              });
+            } catch (e) {
+              if (e.status !== 404) {
+                console.log(`Could not remove awaiting-approval label: ${e.message}`);
+              }
+            }
+
+            // Add merged label
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                labels: ['merged'],
+              });
+            } catch (e) {
+              console.log(`Could not add merged label: ${e.message}`);
+            }
+
+            // Post a final comment with the merge commit SHA
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: [
+                '## ✅ PR Merged Successfully',
+                '',
+                `This PR has been automatically squash-merged following approval by @${reviewer}.`,
+                '',
+                `**Merge commit SHA:** \`${sha}\``,
+                '',
+                '_Any issues linked with `Closes #NNN` or `Fixes #NNN` in the PR body have been automatically closed by GitHub._',
+              ].join('\n'),
+            });

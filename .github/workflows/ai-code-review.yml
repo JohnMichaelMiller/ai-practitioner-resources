@@ -454,20 +454,3 @@ jobs:
               issue_number: context.issue.number,
               body: message,
             });
-
-  # Manual approval workflow trigger
-  # This would be triggered manually by a maintainer through GitHub UI
-  manual-approval:
-    name: 🎯 Manual Approval Checkpoint
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      pull-requests: write
-
-    # Placeholder - in real implementation would have custom trigger
-    if: false # Disabled - triggered manually
-
-    steps:
-      - name: Placeholder for manual approval
-        run: echo "This step would be triggered manually by a maintainer"
