@@ -1,0 +1,43 @@
+name: Stale Issues
+
+# Implements the Needs_Details --> Auto_Abandoned transition from the issue lifecycle state machine.
+# Issues labeled 'needs-details' that receive no response within 30 days are automatically closed.
+# Reference: .github/workflows/ISSUE_LIFECYCLE_STATE_DIAGRAM.md
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # Daily at 9 AM UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          # Only process issues that carry the 'needs-details' label (Needs_Details state)
+          only-labels: "needs-details"
+
+          # Mark as stale after 30 days without activity
+          days-before-stale: 30
+
+          # Close immediately once marked stale (no additional grace period)
+          days-before-close: 0
+
+          # Labels applied during the stale/close lifecycle
+          stale-issue-label: "auto-abandoned"
+          close-issue-label: "auto-abandoned"
+
+          # Remove the stale label if the issue is updated before it is closed
+          remove-stale-when-updated: true
+
+          # Message posted when the issue is marked stale and closed simultaneously
+          stale-issue-message: >
+            This issue has been automatically closed due to inactivity.
+            Reopen if you have the required details.
+
+          # Avoid hitting rate limits on repositories with many issues
+          operations-per-run: 30
