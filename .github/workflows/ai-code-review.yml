@@ -17,6 +17,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write
 
     steps:
       - name: Checkout code
@@ -109,44 +110,92 @@ jobs:
               core.setOutput('status', 'initial');
             }
 
-      - name: Post initial review comment (placeholder)
+      - name: Validate PR format (Stage 1)
+        id: format_check
         uses: actions/github-script@v7
         with:
           script: |
-            // Default to first review round (outputs might not be available)
-            let reviewRound = 1;
-            const totalRounds = 3;
-            const totalRounds = 3;
+            const pr = context.payload.pull_request;
+            const title = pr.title || '';
+            const body = pr.body || '';
 
-            let message = `## 🤖 Code Review - Round ${reviewRound}/${totalRounds}\n\n`;
+            const failures = [];
 
-            if (reviewRound === 1) {
-              message += `**Initial Code Review**\n\n`;
-              message += `This PR will now be reviewed for code quality, architecture, testing, security, and compliance with project standards.\n\n`;
-            } else {
-              message += `**Re-Review After Changes**\n\n`;
-              message += `Evaluating changes from Round ${reviewRound - 1}.\n\n`;
+            // 1. Title follows category: description convention (case-insensitive)
+            const validTypes = ['fix', 'feat', 'feature', 'chore', 'docs', 'refactor', 'test', 'style', 'perf'];
+            const titleRegex = new RegExp(`^(${validTypes.join('|')}):`, 'i');
+            if (!titleRegex.test(title)) {
+              failures.push(`❌ **PR title** must follow \`type: description\` format (e.g. \`feature: add login page\`). Valid types (case-insensitive): ${validTypes.map(t => `\`${t}\``).join(', ')}.`);
             }
 
-            message += `### Review Checklist\n`;
-            message += `- [ ] Architecture & modularity\n`;
-            message += `- [ ] Code quality standards\n`;
-            message += `- [ ] Testing & testability\n`;
-            message += `- [ ] Security\n`;
-            message += `- [ ] Error handling\n`;
-            message += `- [ ] Documentation\n`;
-            message += `- [ ] Performance\n`;
-            message += `- [ ] Project patterns\n\n`;
+            // 2. Body is not empty and >= 100 chars
+            if (!body || body.trim().length < 100) {
+              failures.push('❌ **PR body** must be present and at least 100 characters long.');
+            }
 
-            message += `**Automated checks in progress...**\n\n`;
-            message += `_Note: This is an automated review. Review details will be added shortly._`;
+            // 3. Body contains Closes #NNN or Fixes #NNN
+            if (!/(?:Closes|Fixes)\s+#\d+/i.test(body)) {
+              failures.push('❌ **PR body** must contain an issue reference such as `Closes #123` or `Fixes #123` (case-insensitive).');
+            }
 
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: message,
-            });
+            // 4. No empty template sections — matches an H3 heading followed only by
+            //    whitespace until the next H3 heading or end of body
+            if (/###[^\n]*\n\s*\n(?=###|$)/.test(body)) {
+              failures.push('❌ **PR body** contains empty template sections. Please fill in all sections before submitting.');
+            }
+
+            const labelName = failures.length > 0 ? 'pr-format-invalid' : 'pr-format-valid';
+            const oppositeLabelName = failures.length > 0 ? 'pr-format-valid' : 'pr-format-invalid';
+
+            // Remove the opposite label first (ignore 404 if it isn't present)
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: oppositeLabelName,
+              });
+            } catch (e) {
+              if (e.status !== 404) {
+                console.log(`Could not remove label ${oppositeLabelName}: ${e.message}`);
+              }
+            }
+
+            // Add appropriate label
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: [labelName],
+              });
+            } catch (e) {
+              console.log(`Could not add label ${labelName}: ${e.message}`);
+            }
+
+            if (failures.length > 0) {
+              const comment = [
+                '## ❌ Stage 1 — PR Format Validation Failed',
+                '',
+                'The following format issues must be resolved before this PR can proceed:',
+                '',
+                ...failures,
+                '',
+                '---',
+                '_Please update the PR title and/or body and push again to re-trigger validation._',
+              ].join('\n');
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment,
+              });
+
+              core.setFailed('PR format validation failed. See PR comment for details.');
+            } else {
+              console.log('✅ PR format validation passed.');
+            }
 
       - name: Add in-review label
         uses: actions/github-script@v7
