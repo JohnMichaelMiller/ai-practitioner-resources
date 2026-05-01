@@ -15,6 +15,9 @@ jobs:
   auto-merge:
     name: 🚀 Auto-Merge Approved PR
     runs-on: ubuntu-latest
+    concurrency:
+      group: auto-merge-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
 
     permissions:
       contents: write
