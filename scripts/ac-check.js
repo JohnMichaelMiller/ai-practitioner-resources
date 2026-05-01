@@ -14,39 +14,64 @@ const fetch = require("node-fetch");
 // Helpers
 // ---------------------------------------------------------------------------
 
-function env(name, required = true) {
-  const v = process.env[name];
-  if (required && !v) throw new Error(`${name} not set`);
-  return v;
-}
-
-async function ghFetch(url, opts = {}) {
-  // TOKEN is supported as a local-testing alias; GITHUB_TOKEN is used in CI.
-  const token = process.env.TOKEN || process.env.GITHUB_TOKEN;
-  if (!token) throw new Error("TOKEN/GITHUB_TOKEN not set");
-  const base = process.env.GITHUB_API_URL || "https://api.github.com";
-  const res = await fetch(base + url, {
-    ...opts,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      ...(opts.headers || {}),
-    },
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(
-      `GitHub API ${res.status} ${res.statusText} for ${url}: ${text}`
-    );
+function createLocalHelpers() {
+  function env(name, required = true) {
+    const v = process.env[name];
+    if (required && !v) throw new Error(`${name} not set`);
+    return v;
   }
-  return res;
+
+  async function ghFetch(url, opts = {}) {
+    // TOKEN is supported as a local-testing alias; GITHUB_TOKEN is used in CI.
+    const token = process.env.TOKEN || process.env.GITHUB_TOKEN;
+    if (!token) throw new Error("TOKEN/GITHUB_TOKEN not set");
+    const base = process.env.GITHUB_API_URL || "https://api.github.com";
+    const res = await fetch(base + url, {
+      ...opts,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        ...(opts.headers || {}),
+      },
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(
+        `GitHub API ${res.status} ${res.statusText} for ${url}: ${text}`
+      );
+    }
+    return res;
+  }
+
+  async function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  return { env, ghFetch, sleep };
 }
 
-async function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function loadSharedHelpers() {
+  try {
+    const sharedHelpers = require("./lib/review-helpers");
+    if (
+      sharedHelpers &&
+      typeof sharedHelpers.env === "function" &&
+      typeof sharedHelpers.ghFetch === "function" &&
+      typeof sharedHelpers.sleep === "function"
+    ) {
+      return sharedHelpers;
+    }
+  } catch (error) {
+    if (error.code !== "MODULE_NOT_FOUND") {
+      throw error;
+    }
+  }
+
+  return createLocalHelpers();
 }
 
+const { env, ghFetch, sleep } = loadSharedHelpers();
 // ---------------------------------------------------------------------------
 // GitHub API helpers
 // ---------------------------------------------------------------------------
