@@ -145,6 +145,21 @@ jobs:
             }
 
             const labelName = failures.length > 0 ? 'pr-format-invalid' : 'pr-format-valid';
+            const oppositeLabelName = failures.length > 0 ? 'pr-format-valid' : 'pr-format-invalid';
+
+            // Remove the opposite label first (ignore 404 if it isn't present)
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: oppositeLabelName,
+              });
+            } catch (e) {
+              if (e.status !== 404) {
+                console.log(`Could not remove label ${oppositeLabelName}: ${e.message}`);
+              }
+            }
 
             // Add appropriate label
             try {
