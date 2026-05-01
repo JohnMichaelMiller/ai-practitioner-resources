@@ -307,13 +307,32 @@ async function main() {
 
   // Fetch issue and extract acceptance criteria
   let acceptanceCriteria = null;
+  let issueFetchFailed = false;
+  let issueFetchErrorMessage = "";
   try {
     const issue = await getIssue(owner, repo, issueNumber);
     acceptanceCriteria = extractAcceptanceCriteria(issue.body);
   } catch (e) {
+    issueFetchFailed = true;
+    issueFetchErrorMessage = e.message;
     console.warn(`Could not fetch linked issue #${issueNumber}: ${e.message}`);
   }
 
+  if (issueFetchFailed) {
+    const comment = [
+      `## ℹ️ Stage 3 — Acceptance Criteria`,
+      "",
+      `Linked issue #${issueNumber} could not be fetched, so acceptance criteria verification could not be completed.`,
+      "",
+      `Error: ${issueFetchErrorMessage}`,
+      "",
+      "_This check failed closed to avoid incorrectly marking acceptance criteria as verified when the linked issue is temporarily unavailable._",
+    ].join("\n");
+    await addComment(owner, repo, prNumber, comment);
+    await addLabel(owner, repo, prNumber, "ac-not-met");
+    writeOutput("criteria_met", "false");
+    process.exit(1);
+  }
   if (!acceptanceCriteria) {
     console.log(
       `No '## Acceptance Criteria' section found in issue #${issueNumber}. Skipping AC check.`
