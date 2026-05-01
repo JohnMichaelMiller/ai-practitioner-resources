@@ -208,7 +208,33 @@ jobs:
               labels: ['in-review'],
             });
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run AI Code Review (Stage 2)
+        id: ai_review
+        # Skip if we have already exceeded the review round limit (status == 'escalate')
+        if: steps.review_check.outputs.status != 'escalate'
+        continue-on-error: true
+        run: node scripts/ai-code-review.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PR_NUMBER: ${{ steps.pr_details.outputs.pr_number }}
+          REVIEW_ROUND: ${{ steps.review_check.outputs.review_round }}
+
       - name: Escalate to human review
+        # Escalate when status is already 'escalate' (4th+ push) OR after round 3 with no approval
+        if: >-
+          steps.review_check.outputs.status == 'escalate' ||
+          (steps.review_check.outputs.review_round == '3' &&
+           steps.ai_review.outputs.approved != 'true')
         uses: actions/github-script@v7
         with:
           script: |
@@ -251,13 +277,13 @@ jobs:
             });
 
       - name: Request human review if escalated
+        if: >-
+          steps.review_check.outputs.status == 'escalate' ||
+          (steps.review_check.outputs.review_round == '3' &&
+           steps.ai_review.outputs.approved != 'true')
         uses: actions/github-script@v7
         with:
           script: |
-            // Get CODEOWNERS to assign maintainers
-            // This would typically read from CODEOWNERS file
-            // For now, we'll use a default team
-
             const assignees = ['${{ github.repository_owner }}'];
 
             try {
@@ -270,6 +296,16 @@ jobs:
             } catch (e) {
               console.log('Could not assign, repository owner may need permissions');
             }
+
+      - name: Fail if AI review did not approve
+        # Run when the AI review step ran (not skipped) and did not approve
+        if: >-
+          steps.ai_review.outcome != 'skipped' &&
+          (steps.ai_review.outcome != 'success' ||
+           steps.ai_review.outputs.approved != 'true')
+        run: |
+          echo "AI code review did not approve this PR. Address the issues in the review comment and push new commits."
+          exit 1
 
   acceptance-criteria:
     name: ✅ Acceptance Criteria Verification
