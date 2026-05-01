@@ -323,6 +323,7 @@ async function main() {
       "_Add an issue reference to enable automated AC checking._",
     ].join("\n");
     await addComment(owner, repo, prNumber, comment);
+    await removeLabel(owner, repo, prNumber, "ac-not-met");
     await addLabel(owner, repo, prNumber, "ac-verified");
     writeOutput("criteria_met", "true");
     process.exit(0);
@@ -371,6 +372,7 @@ async function main() {
       "_Add an `## Acceptance Criteria` section to the linked issue to enable automated checking._",
     ].join("\n");
     await addComment(owner, repo, prNumber, comment);
+    await removeLabel(owner, repo, prNumber, "ac-not-met");
     await addLabel(owner, repo, prNumber, "ac-verified");
     writeOutput("criteria_met", "true");
     process.exit(0);
