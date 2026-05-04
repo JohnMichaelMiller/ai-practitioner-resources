@@ -3,7 +3,7 @@ name: Rebalance on Close
 on:
   workflow_dispatch:
   issues:
-    types: [closed]
+    types: [ closed ]
 
 permissions:
   issues: write
