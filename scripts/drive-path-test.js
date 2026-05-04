@@ -16,7 +16,9 @@
 const fetch = require("node-fetch");
 
 const TOKEN = process.env.GITHUB_TOKEN || process.env.TOKEN;
-const REPO = process.env.GITHUB_REPOSITORY || "JohnMichaelMiller/ai-practitioner-resources";
+const REPO =
+  process.env.GITHUB_REPOSITORY ||
+  "JohnMichaelMiller/ai-practitioner-resources";
 const [OWNER, REPO_NAME] = REPO.split("/");
 const API = process.env.GITHUB_API_URL || "https://api.github.com";
 const DRY_RUN = process.env.DRY_RUN === "true";
@@ -197,8 +199,12 @@ function parseExit(body) {
   const reasonMatch = exitSection.match(/\*\*Close reason:\*\*\s*(.+)/);
 
   const exitState = stateMatch ? stateMatch[1].trim() : "unknown";
-  const reasonText = reasonMatch ? reasonMatch[1].trim().toLowerCase() : "completed";
-  const stateReason = reasonText.startsWith("not planned") ? "not_planned" : "completed";
+  const reasonText = reasonMatch
+    ? reasonMatch[1].trim().toLowerCase()
+    : "completed";
+  const stateReason = reasonText.startsWith("not planned")
+    ? "not_planned"
+    : "completed";
 
   return { exitState, stateReason };
 }
@@ -247,8 +253,12 @@ async function verifyStep(number, stepNum, expectedPresent, expectedAbsent) {
     `**Expected labels:** ${expectedPresent.map((l) => `\`${l}\``).join(", ") || "_none_"}`,
     `**Actual labels:** ${[...actual].map((l) => `\`${l}\``).join(", ") || "_none_"}`,
   ];
-  if (missing.length) lines.push(`**Missing:** ${missing.map((l) => `\`${l}\``).join(", ")}`);
-  if (unwanted.length) lines.push(`**Should not be present:** ${unwanted.map((l) => `\`${l}\``).join(", ")}`);
+  if (missing.length)
+    lines.push(`**Missing:** ${missing.map((l) => `\`${l}\``).join(", ")}`);
+  if (unwanted.length)
+    lines.push(
+      `**Should not be present:** ${unwanted.map((l) => `\`${l}\``).join(", ")}`,
+    );
 
   await postComment(number, lines.join("\n"));
   return false;
@@ -326,7 +336,10 @@ async function driveIssue(number) {
 
   // 5. Check the path checkbox if everything passed
   if (!failed && body.includes("- [ ] Path followed correctly")) {
-    const updatedBody = body.replace("- [ ] Path followed correctly", "- [x] Path followed correctly");
+    const updatedBody = body.replace(
+      "- [ ] Path followed correctly",
+      "- [x] Path followed correctly",
+    );
     await updateBody(number, updatedBody);
     console.log(`  Checked off "Path followed correctly"`);
   }
@@ -346,11 +359,12 @@ async function main() {
 
   console.log(`Repository : ${OWNER}/${REPO_NAME}`);
   console.log(`Dry run    : ${DRY_RUN}`);
-  if (ISSUE_FILTER) console.log(`Filter     : issues ${ISSUE_FILTER.join(", ")}`);
+  if (ISSUE_FILTER)
+    console.log(`Filter     : issues ${ISSUE_FILTER.join(", ")}`);
 
   // Fetch all workflow-path-test issues (open and closed, for reset support)
   const issues = await ghGet(
-    `/repos/${OWNER}/${REPO_NAME}/issues?labels=workflow-path-test&state=all&per_page=100`
+    `/repos/${OWNER}/${REPO_NAME}/issues?labels=workflow-path-test&state=all&per_page=100`,
   );
 
   const targets = issues
@@ -376,7 +390,9 @@ async function main() {
 
   const passed = results.filter((r) => r.result === "PASS").length;
   const failed = results.filter((r) => r.result === "FAIL").length;
-  const skipped = results.filter((r) => !["PASS", "FAIL"].includes(r.result)).length;
+  const skipped = results.filter(
+    (r) => !["PASS", "FAIL"].includes(r.result),
+  ).length;
   console.log("─".repeat(30));
   console.log(`${passed} passed  ${failed} failed  ${skipped} skipped`);
 
