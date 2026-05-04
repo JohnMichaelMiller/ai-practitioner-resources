@@ -10,8 +10,8 @@ on:
     inputs:
       issue_numbers:
         description: >
-          Comma-separated issue numbers to drive (blank = all workflow-path-test issues).
-          Example: 185,186,187
+          Comma-separated issue numbers to drive (blank = all workflow-path-test
+          issues). Example: 185,186,187
         required: false
         default: ""
       dry_run:
