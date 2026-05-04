@@ -3,9 +3,9 @@ name: Issue Intake
 on:
   workflow_dispatch:
   issues:
-    types: [opened, edited]
+    types: [ opened, edited ]
   issue_comment:
-    types: [created, edited]
+    types: [ created, edited ]
 
 permissions:
   issues: write
@@ -47,7 +47,8 @@ jobs:
         run: node scripts/issue-intake.js
 
       - name: Copilot PM review (AI)
-        if: "!contains(fromJSON(steps.intake.outputs.labels_json || '[]'), 'needs-details')"
+        if: "!contains(fromJSON(steps.intake.outputs.labels_json || '[]'),
+          'needs-details')"
         continue-on-error: true
         env:
           TOKEN: ${{ secrets.PROJECTS_TOKEN }}
