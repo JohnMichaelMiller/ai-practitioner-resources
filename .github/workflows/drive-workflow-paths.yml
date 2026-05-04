@@ -1,0 +1,48 @@
+name: Drive Workflow Path Tests
+
+# Drives every workflow-path-test issue through the path specified in its body,
+# verifies the state after each step, and posts a comment on any failure.
+# Issues are reset to a clean state before each run, so the workflow is
+# fully re-runnable.
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_numbers:
+        description: >
+          Comma-separated issue numbers to drive (blank = all workflow-path-test issues).
+          Example: 185,186,187
+        required: false
+        default: ""
+      dry_run:
+        description: "Parse and log only — no labels, comments, or state changes written"
+        type: boolean
+        default: false
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  drive:
+    name: Drive path tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci --omit=dev
+
+      - name: Drive and verify workflow paths
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBERS: ${{ inputs.issue_numbers }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: node scripts/drive-path-test.js

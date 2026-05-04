@@ -16,20 +16,36 @@ The dual-project architecture separates production work from workflow testing:
 
 ## Step 1: Create GitHub Projects
 
-### Create Test Project
+GitHub Projects V2 are created at the **user level**, not the repository level. Navigate to https://github.com/new/project to create a new project.
 
-1. Go to your repository on GitHub
-2. Click the "Projects" tab
-3. Click "New project"
-4. Choose "Board" template
-5. Name it: **"Workflow Testing"**
-6. Note the project number (e.g., #1)
+- All projects: https://github.com/JohnMichaelMiller?tab=projects
+- Production project (#1): https://github.com/users/JohnMichaelMiller/projects/1
 
 ### Create Production Project (if not exists)
 
-1. Repeat the same steps
-2. Name it: **"AI Practitioner Resources"** or your preferred name
-3. Note the project number (e.g., #2)
+```powershell
+$projects = gh project list --owner JohnMichaelMiller --format json | ConvertFrom-Json
+if (-not ($projects.projects | Where-Object { $_.title -eq 'AI Practitioner Resources' })) {
+    gh project create --owner JohnMichaelMiller --title "AI Practitioner Resources"
+} else {
+    Write-Host "Project 'AI Practitioner Resources' already exists."
+}
+```
+
+Note the project number from the output URL (e.g., `#1`).
+
+### Create Test Project
+
+```powershell
+$projects = gh project list --owner JohnMichaelMiller --format json | ConvertFrom-Json
+if (-not ($projects.projects | Where-Object { $_.title -eq 'Workflow Testing' })) {
+    gh project create --owner JohnMichaelMiller --title "Workflow Testing"
+} else {
+    Write-Host "Project 'Workflow Testing' already exists."
+}
+```
+
+Note the project number from the output URL (e.g., `#2`).
 
 ## Step 2: Configure Environment Variables
 
@@ -40,7 +56,7 @@ Set these when running test scripts:
 ```bash
 export GITHUB_TOKEN=ghp_your_token_here
 export TEST_PROJECT_NUMBER=1  # The test project number
-export GITHUB_REPOSITORY=j0hnnymiller/ai-practitioner-resources
+export GITHUB_REPOSITORY=JohnMichaelMiller/ai-practitioner-resources
 ```
 
 ### For Production Workflows
@@ -67,7 +83,7 @@ Project IDs are needed for GraphQL operations. Run this to get them:
 node -e "
 const { getProjectId } = require('./scripts/lib/graphql-helpers');
 (async () => {
-  const project = await getProjectId('j0hnnymiller', 1, process.env.GITHUB_TOKEN);
+  const project = await getProjectId('JohnMichaelMiller', 1, process.env.GITHUB_TOKEN);
   console.log('Test Project ID:', project.id);
 })();
 "
@@ -76,7 +92,7 @@ const { getProjectId } = require('./scripts/lib/graphql-helpers');
 node -e "
 const { getProjectId } = require('./scripts/lib/graphql-helpers');
 (async () => {
-  const project = await getProjectId('j0hnnymiller', 2, process.env.GITHUB_TOKEN);
+  const project = await getProjectId('JohnMichaelMiller', 2, process.env.GITHUB_TOKEN);
   console.log('Production Project ID:', project.id);
 })();
 "

@@ -21,6 +21,10 @@ jobs:
           # Only process issues that carry the 'needs-details' label (Needs_Details state)
           only-labels: "needs-details"
 
+          # Never auto-abandon workflow-path-test issues — the test driver
+          # manages their lifecycle, including the needs-details → abandoned path.
+          exempt-issue-labels: "workflow-path-test"
+
           # Mark as stale after 30 days without activity
           days-before-stale: 30
 

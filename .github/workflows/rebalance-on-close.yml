@@ -13,6 +13,9 @@ permissions:
 jobs:
   rebalance:
     runs-on: ubuntu-latest
+    # Skip workflow-path-test issues — their close events are driven by
+    # drive-workflow-paths.yml and must not trigger production rebalancing.
+    if: "!contains(github.event.issue.labels.*.name, 'workflow-path-test')"
     steps:
       - name: Checkout
         uses: actions/checkout@v4

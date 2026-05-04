@@ -9,9 +9,9 @@ const fetch = require("node-fetch");
 const LANES = ["at bat", "on deck", "in the hole", "on the bench"];
 
 async function ghFetch(url, opts = {}) {
-  // Prefer explicit PAT (TOKEN) over the default GITHUB_TOKEN, which often lacks access to user-owned Projects v2
-  const token = process.env.TOKEN || process.env.GITHUB_TOKEN;
-  if (!token) throw new Error("TOKEN/GITHUB_TOKEN not set");
+  // REST API calls work with GITHUB_TOKEN (repo-scoped). Only GraphQL/Projects v2 needs the PAT.
+  const token = process.env.GITHUB_TOKEN || process.env.TOKEN;
+  if (!token) throw new Error("GITHUB_TOKEN/TOKEN not set");
   const base = process.env.GITHUB_API_URL || "https://api.github.com";
   const res = await fetch(base + url, {
     ...opts,

@@ -15,6 +15,11 @@ permissions:
 jobs:
   intake:
     runs-on: ubuntu-latest
+    # Skip issues created by the path-test driver — those are driven by
+    # drive-workflow-paths.yml and must not be processed by production automation.
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      !contains(github.event.issue.labels.*.name, 'workflow-path-test')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
