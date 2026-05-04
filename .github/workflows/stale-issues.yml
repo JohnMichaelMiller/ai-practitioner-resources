@@ -40,8 +40,8 @@ jobs:
 
           # Message posted when the issue is marked stale and closed simultaneously
           stale-issue-message: >
-            This issue has been automatically closed due to inactivity.
-            Reopen if you have the required details.
+            This issue has been automatically closed due to inactivity. Reopen
+            if you have the required details.
 
           # Avoid hitting rate limits on repositories with many issues
           operations-per-run: 30
