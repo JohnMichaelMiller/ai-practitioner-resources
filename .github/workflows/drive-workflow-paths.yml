@@ -22,6 +22,7 @@ on:
 permissions:
   issues: write
   contents: read
+  repository-projects: write
 
 jobs:
   drive:
@@ -41,8 +42,12 @@ jobs:
 
       - name: Drive and verify workflow paths
         env:
+          TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          PROJECT_OWNER: ${{ github.repository_owner }}
+          PROJECT_NUMBER: 5
+          PROJECT_STATUS_FIELD_NAME: Status
           ISSUE_NUMBERS: ${{ inputs.issue_numbers }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: node scripts/drive-path-test.js

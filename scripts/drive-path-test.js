@@ -21,10 +21,19 @@ const REPO =
   "JohnMichaelMiller/ai-practitioner-resources";
 const [OWNER, REPO_NAME] = REPO.split("/");
 const API = process.env.GITHUB_API_URL || "https://api.github.com";
+const GRAPHQL_API =
+  process.env.GITHUB_GRAPHQL_URL || "https://api.github.com/graphql";
 const DRY_RUN = process.env.DRY_RUN === "true";
 const ISSUE_FILTER = process.env.ISSUE_NUMBERS
   ? process.env.ISSUE_NUMBERS.split(",").map((s) => parseInt(s.trim(), 10))
   : null;
+const PROJECT_OWNER = process.env.PROJECT_OWNER || OWNER;
+const PROJECT_NUMBER = Number(process.env.PROJECT_NUMBER || 5);
+const PROJECT_STATUS_FIELD_NAME =
+  process.env.PROJECT_STATUS_FIELD_NAME || "Status";
+const LANE_LABELS = ["at bat", "on deck", "in the hole", "on the bench"];
+
+let projectContextPromise;
 
 // ─── GitHub REST helpers ──────────────────────────────────────────────────────
 
@@ -96,6 +105,25 @@ async function ghDelete(path) {
   }
 }
 
+async function ghGraphQL(query, variables) {
+  const res = await fetch(GRAPHQL_API, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  const data = await res.json();
+  if (!res.ok || data.errors) {
+    throw new Error(`GraphQL error: ${JSON.stringify(data.errors || data)}`);
+  }
+
+  return data.data;
+}
+
 // ─── Issue operations ─────────────────────────────────────────────────────────
 
 function issuePath(number) {
@@ -127,6 +155,165 @@ async function updateBody(number, body) {
 
 async function postComment(number, markdown) {
   await ghPost(`${issuePath(number)}/comments`, { body: markdown });
+}
+
+async function getProjectContext() {
+  if (!projectContextPromise) {
+    projectContextPromise = loadProjectContext();
+  }
+  return projectContextPromise;
+}
+
+async function loadProjectContext() {
+  const query = `query($login:String!,$number:Int!){ user(login:$login){ projectV2(number:$number){ id number fields(first:100){ nodes{ __typename ... on ProjectV2FieldCommon { id name } ... on ProjectV2SingleSelectField { id name options{ id name } } } } } } }`;
+  const data = await ghGraphQL(query, {
+    login: PROJECT_OWNER,
+    number: PROJECT_NUMBER,
+  });
+  const project = data?.user?.projectV2;
+
+  if (!project) {
+    throw new Error(
+      `Project ${PROJECT_NUMBER} not found for user ${PROJECT_OWNER}`,
+    );
+  }
+
+  const statusField = (project.fields?.nodes || []).find(
+    (field) =>
+      String(field.name).toLowerCase() ===
+        PROJECT_STATUS_FIELD_NAME.toLowerCase() && Array.isArray(field.options),
+  );
+
+  if (!statusField) {
+    throw new Error(
+      `Status field '${PROJECT_STATUS_FIELD_NAME}' not found in project ${PROJECT_NUMBER}`,
+    );
+  }
+
+  return {
+    projectId: project.id,
+    projectNumber: project.number,
+    statusFieldId: statusField.id,
+    statusOptions: statusField.options,
+  };
+}
+
+function resolveProjectStatusOptionId(options, name) {
+  const option = (options || []).find(
+    (entry) => entry.name.toLowerCase() === name.toLowerCase(),
+  );
+  return option?.id || null;
+}
+
+function desiredProjectStatusFromState(state, labels) {
+  if (String(state).toLowerCase() === "closed") {
+    return "Done";
+  }
+
+  const activeLabels = new Set(labels.map((label) => label.toLowerCase()));
+  if (activeLabels.has("at bat") || activeLabels.has("implementation ready")) {
+    return "In Progress";
+  }
+
+  return "Todo";
+}
+
+async function getIssueProjectItem(number) {
+  const issue = await getIssue(number);
+  const { projectId } = await getProjectContext();
+  const query = `query($id:ID!,$fieldName:String!){ node(id:$id){ ... on Issue { projectItems(first:20){ nodes{ id project{ id number } fieldValueByName(name:$fieldName){ ... on ProjectV2ItemFieldSingleSelectValue { name optionId } } } } } } }`;
+  const data = await ghGraphQL(query, {
+    id: issue.node_id,
+    fieldName: PROJECT_STATUS_FIELD_NAME,
+  });
+  const items = data?.node?.projectItems?.nodes || [];
+  const item = items.find((entry) => entry.project?.id === projectId) || null;
+
+  return {
+    issue,
+    itemId: item?.id || null,
+    statusName: item?.fieldValueByName?.name || null,
+  };
+}
+
+async function addIssueToProject(contentId) {
+  const { projectId } = await getProjectContext();
+  const mutation = `mutation($projectId:ID!,$contentId:ID!){ addProjectV2ItemById(input:{ projectId:$projectId, contentId:$contentId }){ item{ id } } }`;
+  const data = await ghGraphQL(mutation, { projectId, contentId });
+  return data?.addProjectV2ItemById?.item?.id || null;
+}
+
+async function setProjectItemStatus(itemId, optionId) {
+  const { projectId, statusFieldId } = await getProjectContext();
+  const mutation = `mutation($projectId:ID!,$itemId:ID!,$fieldId:ID!,$optionId:String!){ updateProjectV2ItemFieldValue(input:{ projectId:$projectId, itemId:$itemId, fieldId:$fieldId, value:{ singleSelectOptionId:$optionId } }){ projectV2Item{ id } } }`;
+  await ghGraphQL(mutation, {
+    projectId,
+    itemId,
+    fieldId: statusFieldId,
+    optionId,
+  });
+}
+
+async function ensureProjectStatus(number, title, desiredStatus) {
+  const { statusOptions } = await getProjectContext();
+  let { issue, itemId, statusName } = await getIssueProjectItem(number);
+
+  await commentExamination(
+    number,
+    title,
+    [`- Project status should be: \`${desiredStatus}\``],
+    [`- Project status found: \`${statusName || "none"}\``],
+  );
+
+  if (!itemId) {
+    itemId = await addIssueToProject(issue.node_id);
+    await commentUpdate(number, "Issue Added To Workflow Testing Project", [
+      `- Added issue to project #${PROJECT_NUMBER}`,
+    ]);
+    ({ issue, itemId, statusName } = await getIssueProjectItem(number));
+  }
+
+  if (statusName === desiredStatus) {
+    return desiredStatus;
+  }
+
+  const optionId = resolveProjectStatusOptionId(statusOptions, desiredStatus);
+  if (!optionId) {
+    throw new Error(`Project status option '${desiredStatus}' not found`);
+  }
+
+  await setProjectItemStatus(itemId, optionId);
+  await commentUpdate(number, "Workflow Testing Project Status Updated", [
+    `- Previous project status: \`${statusName || "none"}\``,
+    `- New project status: \`${desiredStatus}\``,
+  ]);
+
+  return desiredStatus;
+}
+
+function formatLabelList(labels) {
+  if (!labels || labels.length === 0) return "_none_";
+  return labels.map((label) => `\`${label}\``).join(", ");
+}
+
+async function commentExamination(number, title, expectedLines, actualLines) {
+  const lines = [`## ${title}`, ""];
+
+  if (expectedLines.length) {
+    lines.push("**Expected**");
+    lines.push(...expectedLines);
+    lines.push("");
+  }
+
+  lines.push("**Actual**");
+  lines.push(...actualLines);
+
+  await postComment(number, lines.join("\n"));
+}
+
+async function commentUpdate(number, title, detailLines) {
+  const lines = [`## ${title}`, "", ...detailLines];
+  await postComment(number, lines.join("\n"));
 }
 
 // ─── Body parsing ─────────────────────────────────────────────────────────────
@@ -217,13 +404,39 @@ const PROTECTED_LABELS = new Set(["workflow-path-test"]);
 
 async function resetIssue(number) {
   const issue = await getIssue(number);
+  const currentLabels = issue.labels.map((l) => l.name).sort();
+  const labelsToRemove = currentLabels.filter(
+    (label) => !PROTECTED_LABELS.has(label),
+  );
+  const resetAdds = currentLabels.includes("on the bench")
+    ? []
+    : ["on the bench"];
+
+  await commentExamination(
+    number,
+    "Examining Issue Before Reset",
+    [
+      "- State: open before path replay begins",
+      "- State reason: `none`",
+      "- Labels: `workflow-path-test`, `on the bench`",
+    ],
+    [
+      `- State: \`${issue.state}\``,
+      `- State reason: \`${issue.state_reason || "none"}\``,
+      `- Labels: ${formatLabelList(currentLabels)}`,
+    ],
+  );
+  await ensureProjectStatus(
+    number,
+    "Examining Workflow Testing Project Status Before Reset",
+    desiredProjectStatusFromState(issue.state, currentLabels),
+  );
 
   if (issue.state === "closed") {
     await setIssueState(number, "open", null);
     console.log(`  Reopened #${number}`);
   }
 
-  const currentLabels = issue.labels.map((l) => l.name);
   for (const label of currentLabels) {
     if (!PROTECTED_LABELS.has(label)) {
       await removeLabel(number, label);
@@ -231,6 +444,20 @@ async function resetIssue(number) {
   }
 
   await addLabels(number, ["on the bench"]);
+  await commentUpdate(number, "Issue Updated During Reset", [
+    `- Reopened: ${issue.state === "closed" ? "yes" : "no"}`,
+    `- Removed labels: ${formatLabelList(labelsToRemove)}`,
+    "- Added labels: `on the bench`",
+    "- Resulting baseline: state `open`, labels `workflow-path-test`, `on the bench`",
+  ]);
+  await ensureProjectStatus(
+    number,
+    "Examining Workflow Testing Project Status After Reset",
+    desiredProjectStatusFromState("open", [
+      "workflow-path-test",
+      "on the bench",
+    ]),
+  );
   console.log(`  Reset #${number}: [workflow-path-test, on the bench]`);
 }
 
@@ -239,9 +466,29 @@ async function resetIssue(number) {
 async function verifyStep(number, stepNum, expectedPresent, expectedAbsent) {
   const issue = await getIssue(number);
   const actual = new Set(issue.labels.map((l) => l.name));
+  const actualLabels = [...actual].sort();
 
   const missing = expectedPresent.filter((l) => !actual.has(l));
   const unwanted = expectedAbsent.filter((l) => actual.has(l));
+
+  await commentExamination(
+    number,
+    `Examining Step ${stepNum}`,
+    [
+      `- Labels that should be present: ${formatLabelList([...expectedPresent].sort())}`,
+      `- Labels that should be absent: ${formatLabelList([...expectedAbsent].sort())}`,
+    ],
+    [
+      `- Labels found: ${formatLabelList(actualLabels)}`,
+      `- Missing required labels: ${formatLabelList(missing)}`,
+      `- Unexpected labels still present: ${formatLabelList(unwanted)}`,
+    ],
+  );
+  await ensureProjectStatus(
+    number,
+    `Examining Workflow Testing Project Status At Step ${stepNum}`,
+    desiredProjectStatusFromState("open", actualLabels),
+  );
 
   if (missing.length === 0 && unwanted.length === 0) {
     return true;
@@ -266,6 +513,25 @@ async function verifyStep(number, stepNum, expectedPresent, expectedAbsent) {
 
 async function verifyFinalState(number, expectedStateReason) {
   const issue = await getIssue(number);
+
+  await commentExamination(
+    number,
+    "Examining Final State",
+    ["- State: `closed`", `- State reason: \`${expectedStateReason}\``],
+    [
+      `- State: \`${issue.state}\``,
+      `- State reason: \`${issue.state_reason || "none"}\``,
+      `- Labels: ${formatLabelList(issue.labels.map((label) => label.name).sort())}`,
+    ],
+  );
+  await ensureProjectStatus(
+    number,
+    "Examining Workflow Testing Project Status At Final State",
+    desiredProjectStatusFromState(
+      "closed",
+      issue.labels.map((label) => label.name),
+    ),
+  );
 
   if (issue.state === "closed" && issue.state_reason === expectedStateReason) {
     return true;
@@ -317,6 +583,10 @@ async function driveIssue(number) {
   for (const { step, add, remove } of labelSteps) {
     if (add.length) await addLabels(number, add);
     for (const l of remove) await removeLabel(number, l);
+    await commentUpdate(number, `Issue Updated At Step ${step}`, [
+      `- Added labels: ${formatLabelList(add)}`,
+      `- Removed labels: ${formatLabelList(remove)}`,
+    ]);
 
     for (const l of add) presentLabels.add(l);
     for (const l of remove) presentLabels.delete(l);
@@ -328,6 +598,11 @@ async function driveIssue(number) {
 
   // 3. Close with the expected state reason
   await setIssueState(number, "closed", stateReason);
+  await commentUpdate(number, "Issue Closed By Driver", [
+    "- Updated state: `closed`",
+    `- Applied state reason: \`${stateReason}\``,
+    `- Expected exit: \`${exitState}\``,
+  ]);
 
   // 4. Verify final closed state
   const finalOk = await verifyFinalState(number, stateReason);
@@ -341,6 +616,9 @@ async function driveIssue(number) {
       "- [x] Path followed correctly",
     );
     await updateBody(number, updatedBody);
+    await commentUpdate(number, "Issue Body Updated", [
+      "- Checked `Path followed correctly` in the issue body",
+    ]);
     console.log(`  Checked off "Path followed correctly"`);
   }
 
