@@ -22,7 +22,7 @@ jobs:
     steps:
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Preflight Validate Secrets and Gist Access
         shell: bash
@@ -78,7 +78,7 @@ jobs:
 
           echo "✅ Preflight passed: secrets are present and Gist is reachable."
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "20"
 
